@@ -200,8 +200,14 @@
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // CONFIGURAÇÃO FIREBASE (Apenas placeholders - roda em fallback offline por padrão se não ligar)
-        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT_ID.firebaseapp.com", projectId: "PROJECT_ID", storageBucket: "PROJECT_ID.appspot.com", messagingSenderId: "SENDER_ID", appId: "APP_ID" };
-        
+        const firebaseConfig = {
+  apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA",
+  authDomain: "cultura-de-respeito.firebaseapp.com",
+  projectId: "cultura-de-respeito",
+  storageBucket: "cultura-de-respeito.firebasestorage.app",
+  messagingSenderId: "430540209879",
+  appId: "1:430540209879:web:8adfc67ca3e68918323a92"
+};
         let app, auth, db;
         let isFirebaseActive = false;
         let currentUser = null;
