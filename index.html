@@ -30,29 +30,6 @@
         🔊
     </button>
 
-    <div id="reflection-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-slate-900 border border-rose-500/30 p-6 sm:p-8 rounded-3xl max-w-md w-full space-y-5 shadow-2xl">
-            <div class="flex items-center gap-3 text-rose-400">
-                <span class="text-3xl">⚠️</span>
-                <h3 class="text-lg font-black uppercase tracking-wider">Reflexão e Convivência</h3>
-            </div>
-            
-            <div class="space-y-1.5">
-                <p class="text-xs text-slate-400 font-bold uppercase">A tua escolha prejudicial:</p>
-                <p id="reflection-action-name" class="text-xs font-bold text-white bg-slate-950 p-3 rounded-xl border border-slate-800"></p>
-            </div>
-
-            <div class="space-y-1.5">
-                <p class="text-xs text-slate-400 font-bold uppercase">Por que razão perdeste HP?</p>
-                <p id="reflection-explanation" class="text-xs text-rose-200 leading-relaxed bg-rose-950/30 border border-rose-500/10 p-4 rounded-xl"></p>
-            </div>
-
-            <p class="text-[10px] text-slate-400 italic">No ambiente escolar real, ações de agressão, silêncio ou vingança apenas perpetuam ciclos nocivos. Procura sempre caminhos pacíficos, empáticos e seguros!</p>
-
-            <button onclick="closeReflectionModal()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-all uppercase tracking-wider">Compreendi e quero melhorar 🛡️</button>
-        </div>
-    </div>
-
     <main class="max-w-6xl mx-auto p-4 sm:p-6 space-y-8">
         
         <div class="flex items-center gap-2 mb-4 justify-end">
@@ -110,53 +87,6 @@
                     <span id="card-hero-lvl" class="bg-indigo-600/20 text-indigo-400 text-xs px-3 py-1.5 rounded-full font-black border border-indigo-500/20">Lvl 1</span>
                     <button onclick="showEditCharacterForm()" class="block text-[10px] text-slate-400 underline hover:text-white">Alterar Ficha</button>
                 </div>
-            </div>
-
-            <div id="student-radar-box" class="hidden bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">📡</span>
-                    <h3 class="text-lg font-black text-white">Mapear Clima Escolar</h3>
-                </div>
-                <p class="text-xs text-slate-400 leading-relaxed">
-                    Ajuda o QG do Investigador a detetar problemas em tempo real. Reporta anonimamente como se vive a convivência nos espaços da escola.
-                </p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300 block uppercase">Espaço:</label>
-                        <select id="radar-space" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                            <option value="Sala de Aula">Sala de Aula 🏫</option>
-                            <option value="Pátio / Recreio">Pátio / Recreio ⚽</option>
-                            <option value="Casas de Banho">Casas de Banho 🧻</option>
-                            <option value="CANTINA">Refeitório 🍎</option>
-                            <option value="Entrada / Saída">Entrada / Saída 🚪</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300 block uppercase">Como te sentes aqui?</label>
-                        <select id="radar-vibe" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                            <option value="feliz">Excelente / Seguro 😄</option>
-                            <option value="neutro">Normal / Calmo 😐</option>
-                            <option value="preocupado">Inseguro / Tenso 😟</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300 block uppercase">Algum incidente?</label>
-                        <select id="radar-incident" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                            <option value="">Está tudo calmo e seguro ✨</option>
-                            <option value="Bullying ou Ofensas">Bullying ou Ofensas 🗣️</option>
-                            <option value="Vandalismo">Vandalismo / Estragos 🔨</option>
-                            <option value="Exclusão de Colegas">Exclusão Social 🤫</option>
-                            <option value="Agressão Verbal">Agressão Verbal ⚡</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button onclick="enviarRelatorioRadar()" class="w-full mt-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all">
-                    Transmitir Report ao QG 📡
-                </button>
             </div>
         </section>
 
@@ -256,7 +186,7 @@
 
             <section id="battle-defeat-screen" class="hidden max-w-md mx-auto text-center space-y-4 bg-rose-900/20 border border-rose-500/30 p-8 rounded-3xl">
                 <h2 class="text-3xl font-black text-rose-400">Derrota...</h2>
-                <p class="text-sm text-slate-300">A tua energia emocional esgotou-se. Precisas de descansar e tentar outras abordagens.</p>
+                <p class="text-sm text-slate-300">A tua energia emocional esgotou-se. Precisa de descansar e tentar outras abordagens.</p>
                 <button onclick="retryCombat()" class="w-full py-3 bg-rose-600 text-white font-bold rounded-xl">Tentar Novamente ⚔️</button>
             </section>
         </section>
@@ -269,15 +199,16 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO FIREBASE (Apenas placeholders - fallback offline automático)
+        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA",
-            authDomain: "cultura-de-respeito.firebaseapp.com",
-            projectId: "cultura-de-respeito",
-            storageBucket: "cultura-de-respeito.firebasestorage.app",
-            messagingSenderId: "430540209879",
-            appId: "1:430540209879:web:8adfc67ca3e68918323a92"
+          apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA",
+          authDomain: "cultura-de-respeito.firebaseapp.com",
+          projectId: "cultura-de-respeito",
+          storageBucket: "cultura-de-respeito.firebasestorage.app",
+          messagingSenderId: "430540209879",
+          appId: "1:430540209879:web:8adfc67ca3e68918323a92"
         };
+        
         let app, auth, db;
         let isFirebaseActive = false;
         let currentUser = null;
@@ -288,7 +219,7 @@
         let unsubscribeReports = null;
         let unsubscribeCanvas = null;
 
-        // Tentar iniciar conexão ao Firebase
+        // Tentar iniciar conexão ao Firebase de modo seguro
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
@@ -383,7 +314,6 @@
                 playBeepSound('error');
             }
         }
-        window.validateSchoolCode = validateSchoolCode;
 
         function proceedToStudentApp() {
             database.player.schoolCode = activeSchoolCode;
@@ -391,7 +321,6 @@
             document.getElementById('sec-character').classList.remove('hidden');
             document.getElementById('character-school-badge').innerText = `Sincronizado: ${activeSchoolName}`;
             
-            // Corrige os perfis laterais
             document.getElementById('card-hero-nick').innerText = database.player.nick;
             document.getElementById('card-hero-hp').innerText = `HP: ${playerHp}/100`;
 
@@ -474,7 +403,6 @@
                 playBeepSound('error');
             }
         }
-        window.registerInvestigador = registerInvestigador;
 
         // --- LOGIN & LOGOUT DO INVESTIGADOR (COM SUPORTE OFFLINE) ---
         async function loginInvestigador(event) {
@@ -520,7 +448,6 @@
                 playBeepSound('error');
             }
         }
-        window.loginInvestigador = loginInvestigador;
 
         async function logoutInvestigador() {
             if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
@@ -540,7 +467,6 @@
                 }
             }
         }
-        window.logoutInvestigador = logoutInvestigador;
 
         function toggleQGView(showPainel) {
             const loginCard = document.getElementById('qg-auth-box');
@@ -578,10 +504,9 @@
             }
             playBeepSound('success');
         }
-        window.toggleAuthSubTab = toggleAuthSubTab;
 
         // --- SISTEMAS DE NAVEGAÇÃO DE ABAS ---
-        window.switchTab = (tab) => {
+        function switchTab(tab) {
             document.getElementById('sec-character').classList.add('hidden');
             document.getElementById('sec-game').classList.add('hidden');
             document.getElementById('sec-dashboard').classList.add('hidden');
@@ -599,55 +524,55 @@
                 document.getElementById('sec-dashboard').classList.remove('hidden');
             }
             playBeepSound('success');
-        };
+        }
 
         // --- AUXILIARES LOCAIS ---
         let soundEnabled = true;
-        window.toggleSound = () => {
+        function toggleSound() {
             soundEnabled = !soundEnabled;
             showToast(soundEnabled ? '🔊' : '🔇', soundEnabled ? 'Efeitos Sonoros Ligados' : 'Sons Desativados');
-        };
-        window.playBeepSound = (type) => {
+        }
+        function playBeepSound(type) {
             if (!soundEnabled) return;
             console.log("Som ativo:", type);
-        };
-        window.showToast = (emoji, msg) => {
+        }
+        function showToast(emoji, msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-icon').innerText = emoji;
             document.getElementById('toast-msg').innerText = msg;
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
-        };
+        }
 
         // --- TABELA DE TÁTICAS ROTATIVAS DO RPG ---
         const poolTactics = {
             dialogo: [
-                { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Propor o diálogo amigável desarma o espectro ao demonstrar que existem alternativas pacíficas para resolver conflitos.", success: true },
-                { name: "Ouvir os dois lados", dBoss: 45, dPlayer: 0, msg: "A escuta ativa remove barreiras ao permitir compreender as necessidades de todas as partes sem julgamentos precoces.", success: true },
-                { name: "Enviar Mensagem Construtiva", dBoss: 30, dPlayer: 0, msg: "Palavras de apoio e encorajamento dão suporte e força a quem se sente isolado na comunidade.", success: true },
-                { name: "Gritar de volta", dBoss: 0, dPlayer: 25, msg: "Gritar e reagir com agressividade apenas escala a raiva, transformando um pequeno desentendimento num conflito grave.", success: false },
-                { name: "Ignorar e Fugir", dBoss: 0, dPlayer: 20, msg: "Afastares-te e ignorares os problemas dá espaço e força para que comportamentos abusivos se expandam sem oposição.", success: false }
+                { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Escolha equilibrada! Propor o diálogo amigável quebra o ódio.", success: true },
+                { name: "Ouvir os dois lados", dBoss: 45, dPlayer: 0, msg: "Excelente escuta ativa! Entender as razões reduz as barreiras do espectro.", success: true },
+                { name: "Enviar Mensagem Construtiva", dBoss: 30, dPlayer: 0, msg: "Play positivo! Palavras de força e apoio anulam as ofensas.", success: true },
+                { name: "Gritar de volta", dBoss: 0, dPlayer: 25, msg: "Gritar e usar agressividade apenas alimenta a discórdia! Perdeste HP.", success: false },
+                { name: "Ignorar e Fugir", dBoss: 0, dPlayer: 20, msg: "Afastares-te sem agir de todo dá espaço para o conflito crescer. Perdeste HP.", success: false }
             ],
             expressao: [
-                { name: "Desabafar discretamente", dBoss: 45, dPlayer: 0, msg: "Procurar e confiar num adulto responsável permite traçar soluções estruturadas e protege o teu bem-estar emocional.", success: true },
-                { name: "Convidar para o lanche", dBoss: 40, dPlayer: 0, msg: "Integrar colegas excluídos diretamente no círculo social combate ativamente a solidão e promove a empatia espontânea.", success: true },
-                { name: "Denúncia Segura", dBoss: 35, dPlayer: 0, msg: "Comunicar ocorrências de forma discreta e responsável à escola salvaguarda as vítimas sem te expor a riscos desnecessários.", success: true },
-                { name: "Apoiar a exclusão", dBoss: 0, dPlayer: 35, msg: "Juntar-se ao silêncio ou apoiar a exclusão de um colega destrói o clima de união escolar e torna-te cúmplice da injustiça.", success: false },
-                { name: "Guardar o segredo", dBoss: 0, dPlayer: 15, msg: "Ocultar situações graves por receio de agir protege quem pratica bullying e acumula tensão emocional prejudicial.", success: false }
+                { name: "Desabafar discretamente", dBoss: 45, dPlayer: 0, msg: "Decisão corajosa! Conversar com um adulto responsável dita a luz na situação.", success: true },
+                { name: "Convidar para o lanche", dBoss: 40, dPlayer: 0, msg: "Acolhimento perfeito! Trazer o colega excluído para o grupo quebra o silêncio.", success: true },
+                { name: "Denúncia Segura", dBoss: 35, dPlayer: 0, msg: "Uso exemplar da cidadania escolar! Comunicar de forma segura protege a turma.", success: true },
+                { name: "Apoiar a exclusão", dBoss: 0, dPlayer: 35, msg: "Mancada! Juntar-se ao silêncio cúmplice magoa a turma inteira. Sofreste danos graves.", success: false },
+                { name: "Guardar o segredo", dBoss: 0, dPlayer: 15, msg: "Esconder a verdade por medo acumula tensionamento e enfraquece a tua Vibe.", success: false }
             ],
             comunicacao: [
-                { name: "Aplicar Comunicação Não-Violenta", dBoss: 50, dPlayer: 0, msg: "Expressar os teus sentimentos e necessidades de forma pacífica acalma as reações defensivas do oponente.", success: true },
-                { name: "Reunir Mediação de Pares", dBoss: 40, dPlayer: 0, msg: "Recorrer a colegas neutros e mediadores ajuda a estabelecer um acordo equilibrado sem necessidade de sanções rígidas.", success: true },
-                { name: "Praticar Círculo de Empatia", dBoss: 45, dPlayer: 0, msg: "Fazer a turma partilhar vivências comuns desmistifica preconceitos e aproxima os alunos emocionalmente.", success: true },
-                { name: "Planear uma Vingança", dBoss: 0, dPlayer: 40, msg: "A vingança gera novos ressentimentos, alimentando um ciclo vicioso de desforras que impede permanentemente a paz.", success: false },
-                { name: "Espalhar fofoca reativa", dBoss: 0, dPlayer: 30, msg: "Espalhar boatos destrói reputações, agrava o mal-estar coletivo e enfraquece a confiança mútua na turma.", success: false }
+                { name: "Aplicar Comunicação Não-Violenta", dBoss: 50, dPlayer: 0, msg: "Golpe de Mestre! Expressar sentimentos sem acusar desarma qualquer espectro.", success: true },
+                { name: "Reunir Mediação de Pares", dBoss: 40, dPlayer: 0, msg: "Liderança pura! Chamar os colegas mediadores resolveu o atrito.", success: true },
+                { name: "Praticar Círculo de Empatia", dBoss: 45, dPlayer: 0, msg: "Incrível! Fazer a turma partilhar vivências derrete o rancor do Titã.", success: true },
+                { name: "Planear uma Vingança", dBoss: 0, dPlayer: 40, msg: "Combate falhado! Tentar dar o troco cria um círculo infinito de raiva. Danos massivos sofridos!", success: false },
+                { name: "Espalhar fofoca reativa", dBoss: 0, dPlayer: 30, msg: "Falha de tática! Revidar com boatos destrói o clima escolar e fere a tua Vibe.", success: false }
             ],
             preservacao: [
-                { name: "Organizar Mutirão de Limpeza", dBoss: 50, dPlayer: 0, msg: "Trabalhar em equipa para reparar espaços danificados gera orgulho coletivo e desencoraja atos futuros de desrespeito.", success: true },
-                { name: "Denúncia Segura e Rápida", dBoss: 40, dPlayer: 0, msg: "Alertar a coordenação sobre atos de vandalismo no momento correto evita o desperdício de recursos que servem a todos.", success: true },
-                { name: "Oficina de Grafite Autorizado", dBoss: 45, dPlayer: 0, msg: "Canalizar impulsos criativos para a arte urbana autorizada transforma a escola num espaço visualmente acolhedor.", success: true },
-                { name: "Apoiar a destruição das mesas", dBoss: 0, dPlayer: 35, msg: "Apoiar a depredação deteriora o próprio local de aprendizagem, afetando o conforto e os recursos educativos do teu grupo.", success: false },
-                { name: "Ignorar pichagens nas paredes", dBoss: 0, dPlayer: 20, msg: "Ficar indiferente ao vandalismo faz com que a escola pareça negligenciada, o que diminui o sentimento coletivo de segurança.", success: false }
+                { name: "Organizar Mutirão de Limpeza", dBoss: 50, dPlayer: 0, msg: "Trabalho de equipa espetacular! Reparar o que foi estragado desintegra a energia da Gárgula.", success: true },
+                { name: "Denúncia Segura e Rápida", dBoss: 40, dPlayer: 0, msg: "Cidadania ativa! Alertar a escola de forma responsável impede que mais coisas sejam destruídas.", success: true },
+                { name: "Oficina de Grafite Autorizado", dBoss: 45, dPlayer: 0, msg: "Criatividade fantástica! Canalizar a energia para arte urbana autorizada reconstrói a harmonia.", success: true },
+                { name: "Apoiar a destruição das mesas", dBoss: 0, dPlayer: 35, msg: "Ficaste do lado do vandalismo! A escola degradada afeta o teu bem-estar emocional. Danos sofridos!", success: false },
+                { name: "Ignorar pichagens nas paredes", dBoss: 0, dPlayer: 20, msg: "Ao ignorares, a escola fica cada vez mais suja e descuidada. Perdeste HP.", success: false }
             ]
         };
 
@@ -776,7 +701,8 @@
                 { space: "Sala de Aula", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
                 { space: "Pátio / Recreio", vibe: "neutro", incidents: ["Bullying ou Ofensas"], schoolCode: "2567@25" },
                 { space: "Casas de Banho", vibe: "preocupado", incidents: ["Vandalismo"], schoolCode: "2567@25" },
-                { space: "Refeitório", vibe: "feliz", incidents: [], schoolCode: "2567@25" }
+                { space: "Quadra de Desportos", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
+                { space: "Entrada / Saída", vibe: "preocupado", incidents: ["Agressão Verbal"], schoolCode: "2567@25" }
             ],
             canvas: {
                 causas: ["📱 Pressão Digital e Perfis Anónimos", "💬 Falta de Diálogo e Escuta Ativa"],
@@ -784,48 +710,6 @@
                 planos: ["📢 Patrulhas Amigáveis no Recreio", "📬 Caixa Física de Sugestões"]
             }
         };
-
-        // --- [SOLUÇÃO B] ENVIAR REPORT DE RADAR ATIVO PELO ALUNO ---
-        async function enviarRelatorioRadar() {
-            if (!activeSchoolCode) {
-                showToast("⚠️", "Deves sincronizar primeiro a tua escola!");
-                return;
-            }
-
-            const space = document.getElementById('radar-space').value;
-            const vibe = document.getElementById('radar-vibe').value;
-            const incidentSelect = document.getElementById('radar-incident').value;
-            const incidents = incidentSelect ? [incidentSelect] : [];
-
-            const novoReport = {
-                space: space,
-                vibe: vibe,
-                incidents: incidents,
-                schoolCode: activeSchoolCode,
-                timestamp: new Date().toISOString()
-            };
-
-            // 1. Adicionar localmente (In-Memory)
-            database.radarReports.unshift(novoReport);
-
-            // 2. Enviar para a Nuvem se estiver ligado
-            if (isFirebaseActive && currentUser) {
-                await pushReportToCloud(novoReport);
-            }
-
-            // 3. Feedback visual e sonoro
-            playBeepSound('levelup');
-            showToast("📡", `Clima de "${space}" reportado ao QG com sucesso!`);
-            
-            // 4. Se o investigador estiver logado, atualiza o dashboard dele na hora
-            if (isInvestigador) {
-                updateDashboard();
-            }
-
-            // Resetar o campo de incidentes para prevenir spam acidental
-            document.getElementById('radar-incident').value = "";
-        }
-        window.enviarRelatorioRadar = enviarRelatorioRadar;
 
         // --- SISTEMAS DE CUSTOMIZAÇÃO DO HERÓI ---
         const avataresDisponiveis = [
@@ -888,13 +772,11 @@
         function updateCharacterTabUI() {
             const card = document.getElementById('active-character-card');
             const form = document.getElementById('character-creator-form');
-            const radarBox = document.getElementById('student-radar-box');
-            if (!card || !form || !radarBox) return;
+            if (!card || !form) return;
 
             if (database.player.created) {
                 card.classList.remove('hidden');
                 form.classList.add('hidden');
-                radarBox.classList.remove('hidden'); // Libera o Radar de Clima para o Aluno preencher
                 
                 document.getElementById('card-hero-avatar').innerText = database.player.avatar;
                 document.getElementById('card-hero-nick').innerText = database.player.nick;
@@ -904,7 +786,6 @@
             } else {
                 card.classList.add('hidden');
                 form.classList.remove('hidden');
-                radarBox.classList.add('hidden');
             }
         }
 
@@ -913,7 +794,6 @@
             updateCharacterTabUI();
             playBeepSound('success');
         }
-        window.showEditCharacterForm = showEditCharacterForm;
 
         function confirmCharacter() {
             const nickInput = document.getElementById('input-nick').value.trim();
@@ -928,7 +808,6 @@
             database.player.class = classesDisponiveis[selectedClassIdx].nome;
             database.player.created = true;
 
-            // Altera displays no topo e combate
             document.getElementById('combat-profile-avatar').innerText = database.player.avatar;
             document.getElementById('combat-profile-nick').innerText = database.player.nick;
             document.getElementById('combat-profile-class').innerText = database.player.class;
@@ -940,19 +819,16 @@
             updateCharacterTabUI();
             switchTab('game');
         }
-        window.confirmCharacter = confirmCharacter;
 
         // --- SISTEMA DE COMBATE REAL DO RPG ---
         let currentStageIdx = 0;
         let playerHp = 100;
         let currentBossHp = 0;
         let currentTactics = [];
-        let nextTurnFunction = null; // Armazena temporariamente a progressão do combate para aguardar a reflexão
 
         function generateTurnTactics(boss) {
             const weaknessPool = poolTactics[boss.weaknessPool] || [];
             const altPool = poolTactics[boss.altPool] || [];
-            // Mistura duas táticas da fraqueza com duas alternativas aleatórias
             const selected = [
                 ...weaknessPool.slice(0, 2),
                 ...altPool.slice(0, 2)
@@ -1056,25 +932,6 @@
                 });
             }
         }
-        window.loadCombatStage = loadCombatStage;
-
-        // --- [SOLUÇÃO A] GESTÃO DO MODAL DE REFLEXÃO ---
-        function openReflectionModal(tacticName, explanation) {
-            document.getElementById('reflection-action-name').innerText = tacticName;
-            document.getElementById('reflection-explanation').innerText = explanation;
-            document.getElementById('reflection-modal').classList.remove('hidden');
-        }
-
-        function closeReflectionModal() {
-            document.getElementById('reflection-modal').classList.add('hidden');
-            playBeepSound('success');
-            // Prossegue com a resolução lógica do combate pendente
-            if (nextTurnFunction) {
-                nextTurnFunction();
-                nextTurnFunction = null;
-            }
-        }
-        window.closeReflectionModal = closeReflectionModal;
 
         function triggerCombatTurn(tactic, calculatedDmg, isBonus) {
             const boss = bosses[currentStageIdx];
@@ -1089,48 +946,23 @@
             let logEntry = "";
 
             if (tactic.success) {
-                // SUCESSO: O Ataque ocorre normalmente
                 currentBossHp -= calculatedDmg;
                 if (currentBossHp < 0) currentBossHp = 0;
                 playBeepSound('boss_hit');
                 logEntry = `<div class="text-emerald-400 font-bold">[COMBATE] ${database.player.nick} usou "${tactic.name}"! ${tactic.msg} causou ${calculatedDmg} de dano ao ${boss.name}!</div>`;
-                
-                if (logCont) {
-                    logCont.innerHTML += logEntry;
-                    logCont.scrollTop = logCont.scrollHeight;
-                }
-                
-                currentTactics = [];
-                evaluateCombatOutcome();
             } else {
-                // FALHA: Ativa o Modal de Reflexão Crítica obrigatório e retém o dano
                 playerHp -= tactic.dPlayer;
                 if (playerHp < 0) playerHp = 0;
                 playBeepSound('error');
-
-                logEntry = `<div class="text-rose-400 font-bold">[ALERTA] O ${boss.name} contra-atacou! Escolheste "${tactic.name}". Perdeste ${tactic.dPlayer} HP!</div>`;
-                if (logCont) {
-                    logCont.innerHTML += logEntry;
-                    logCont.scrollTop = logCont.scrollHeight;
-                }
-
-                currentTactics = [];
-
-                // Definimos o que acontece ao fechar o modal
-                nextTurnFunction = () => {
-                    evaluateCombatOutcome();
-                };
-
-                // Lança o Modal Pedagógico completo
-                openReflectionModal(tactic.name, tactic.msg);
+                logEntry = `<div class="text-rose-400 font-bold">[ALERTA] O ${boss.name} contra-atacou! ${tactic.msg} perdeste ${tactic.dPlayer} HP!</div>`;
             }
-        }
-        window.triggerCombatTurn = triggerCombatTurn;
 
-        // Centraliza a verificação de HP para correr após o Modal ou após o Ataque
-        function evaluateCombatOutcome() {
-            const boss = bosses[currentStageIdx];
-            const logCont = document.getElementById('battle-log');
+            if (logCont) {
+                logCont.innerHTML += logEntry;
+                logCont.scrollTop = logCont.scrollHeight;
+            }
+
+            currentTactics = [];
 
             if (playerHp <= 0) {
                 playBeepSound('error');
@@ -1164,23 +996,23 @@
             loadCombatStage();
         }
 
-        // --- SISTEMA DE PROVÉM DE CRITÉRIOS DE PROGRESSÃO ---
-        window.nextLevel = () => {
+        // --- SISTEMAS DE PROGRESSÃO ---
+        function nextLevel() {
             currentStageIdx++;
-            currentBossHp = 0; // Reinicia para carregar o novo HP
+            currentBossHp = 0; 
             document.getElementById('battle-victory-screen').classList.add('hidden');
             loadCombatStage();
-        };
+        }
 
-        window.retryCombat = () => {
+        function retryCombat() {
             playerHp = 100;
             currentBossHp = 0;
             currentTactics = [];
             document.getElementById('battle-defeat-screen').classList.add('hidden');
             loadCombatStage();
-        };
+        }
 
-        window.addXP = (amount) => {
+        function addXP(amount) {
             database.player.xp += amount;
             if (database.player.xp >= 100) {
                 database.player.level++;
@@ -1188,14 +1020,14 @@
                 showToast("⭐", `Subiste para o Nível ${database.player.level}!`);
                 playBeepSound('levelup');
             }
-        };
+        }
 
-        window.unlockBadge = (badgeName) => {
+        function unlockBadge(badgeName) {
             if (!database.badges.includes(badgeName)) {
                 database.badges.push(badgeName);
                 showToast("🏅", `Novo Emblema: ${badgeName}`);
             }
-        };
+        }
 
         // --- ATUALIZADORES DE LAYOUT DO INVESTIGADOR (DASHBOARD) ---
         function updateDashboard() {
@@ -1246,7 +1078,23 @@
             }
         }
 
-        // Executa inicialização visual
+        // --- VINCULAÇÃO DAS FUNÇÕES PARA O ESCOPO GLOBAL (VITAL PARA ONLINE) ---
+        window.switchTab = switchTab;
+        window.validateSchoolCode = validateSchoolCode;
+        window.confirmCharacter = confirmCharacter;
+        window.showEditCharacterForm = showEditCharacterForm;
+        window.toggleAuthSubTab = toggleAuthSubTab;
+        window.loginInvestigador = loginInvestigador;
+        window.registerInvestigador = registerInvestigador;
+        window.logoutInvestigador = logoutInvestigador;
+        window.toggleSound = toggleSound;
+        window.playBeepSound = playBeepSound;
+        window.showToast = showToast;
+        window.nextLevel = nextLevel;
+        window.retryCombat = retryCombat;
+        window.loadCombatStage = loadCombatStage;
+
+        // Executa inicialização visual inicial
         renderCharacterCreator();
         updateCharacterTabUI();
     </script>
