@@ -4,15 +4,18 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO FIREBASE
+        // ==========================================
+        // 1. DECLARAÇÃO DE TODAS AS VARIÁVEIS DE ESTADO (Prevenção de TDZ)
+        // ==========================================
         const firebaseConfig = {
-          apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA", // Confirme se é a chave correta nas configurações do seu Firebase Console!
+          apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA", 
           authDomain: "cultura-de-respeito.firebaseapp.com",
           projectId: "cultura-de-respeito",
           storageBucket: "cultura-de-respeito.firebasestorage.app",
           messagingSenderId: "430540209879",
           appId: "1:430540209879:web:8adfc67ca3e68918323a92"
         };
+
         let app, auth, db;
         let isFirebaseActive = false;
         let currentUser = null;
@@ -22,8 +25,144 @@
         let appId = "cadastro_geral";
         let unsubscribeReports = null;
         let unsubscribeCanvas = null;
+        let soundEnabled = true;
 
-        // Ativação segura do Modo Offline quando o Firebase não liga
+        // Estado do Combate e Progressão
+        let currentStageIdx = 0;
+        let playerHp = 100;
+        let currentBossHp = 0;
+        let currentTactics = [];
+
+        // Base de Dados Local / Simulador
+        let database = {
+            player: {
+                nick: "Cyber Fox",
+                avatar: "🦊",
+                class: "Defensor(a) Digital",
+                level: 1,
+                xp: 25,
+                hp: 100,
+                citizenshipPoints: 0,
+                created: false,
+                schoolCode: ""
+            },
+            badges: ["🌱 Iniciante"],
+            radarReports: [
+                { space: "Sala de Aula", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
+                { space: "Pátio / Recreio", vibe: "neutro", incidents: ["Bullying ou Ofensas"], schoolCode: "2567@25" },
+                { space: "Casas de Banho", vibe: "preocupado", incidents: ["Vandalismo"], schoolCode: "2567@25" },
+                { space: "Quadra de Desportos", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
+                { space: "Entrada / Saída", vibe: "preocupado", incidents: ["Agressão Verbal"], schoolCode: "2567@25" }
+            ],
+            canvas: {
+                causas: ["📱 Pressão Digital e Perfis Anónimos", "💬 Falta de Diálogo e Escuta Ativa"],
+                solucoes: ["🕊️ Círculos de Construção de Paz", "🧠 Oficinas de Comunicação Não-Violenta"],
+                planos: ["📢 Patrulhas Amigáveis no Recreio", "📬 Caixa Física de Sugestões"]
+            }
+        };
+
+        // Dados estáticos do RPG
+        const poolTactics = {
+            dialogo: [
+                { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Escolha equilibrada! Propor o diálogo amigável quebra o ódio.", success: true },
+                { name: "Ouvir os dois lados", dBoss: 45, dPlayer: 0, msg: "Excelente escuta ativa! Entender as razões reduz as barreiras.", success: true },
+                { name: "Enviar Mensagem Construtiva", dBoss: 30, dPlayer: 0, msg: "Play positivo! Palavras de força e apoio anulam as ofensas.", success: true },
+                { name: "Gritar de volta", dBoss: 0, dPlayer: 25, msg: "Gritar e usar agressividade apenas alimenta a discórdia! Perdeste HP.", success: false },
+                { name: "Ignorar e Fugir", dBoss: 0, dPlayer: 20, msg: "Afastares-te sem agir dá espaço para o conflito crescer. Perdeste HP.", success: false }
+            ],
+            expressao: [
+                { name: "Desabafar discretamente", dBoss: 45, dPlayer: 0, msg: "Decisão corajosa! Conversar com um adulto responsável dita a luz na situação.", success: true },
+                { name: "Convidar para o lanche", dBoss: 40, dPlayer: 0, msg: "Acolhimento perfeito! Trazer o colega excluído para o grupo quebra o silêncio.", success: true },
+                { name: "Denúncia Segura", dBoss: 35, dPlayer: 0, msg: "Uso exemplar da cidadania escolar! Comunicar de forma segura protege a turma.", success: true },
+                { name: "Apoiar a exclusão", dBoss: 0, dPlayer: 35, msg: "Mancada! Juntar-se ao silêncio cúmplice magoa a turma inteira. Sofreste danos graves.", success: false },
+                { name: "Guardar o segredo", dBoss: 0, dPlayer: 15, msg: "Esconder a verdade por medo acumula tensionamento e enfraquece a tua Vibe.", success: false }
+            ],
+            comunicacao: [
+                { name: "Aplicar Comunicação Não-Violenta", dBoss: 50, dPlayer: 0, msg: "Golpe de Mestre! Expressar sentimentos sem acusar desarma o espectro.", success: true },
+                { name: "Reunir Mediação de Pares", dBoss: 40, dPlayer: 0, msg: "Liderança pura! Chamar os colegas mediadores resolveu o atrito.", success: true },
+                { name: "Praticar Círculo de Empatia", dBoss: 45, dPlayer: 0, msg: "Incrível! Fazer a turma partilhar vivências derrete o rancor do Titã.", success: true },
+                { name: "Planear uma Vingança", dBoss: 0, dPlayer: 40, msg: "Combate falhado! Tentar dar o troco cria um círculo infinito de raiva.", success: false },
+                { name: "Espalhar fofoca reativa", dBoss: 0, dPlayer: 30, msg: "Falha de tática! Revidar com boatos destrói o clima escolar.", success: false }
+            ],
+            preservacao: [
+                { name: "Organizar Mutirão de Limpeza", dBoss: 50, dPlayer: 0, msg: "Trabalho de equipa espetacular! Reparar o que foi estragado reconstrói a harmonia.", success: true },
+                { name: "Denúncia Segura e Rápida", dBoss: 40, dPlayer: 0, msg: "Cidadania ativa! Alertar a escola de forma responsável impede a destruição.", success: true },
+                { name: "Oficina de Grafite Autorizado", dBoss: 45, dPlayer: 0, msg: "Criatividade fantástica! Canalizar a energia para arte urbana autorizada.", success: true },
+                { name: "Apoiar a destruição das mesas", dBoss: 0, dPlayer: 35, msg: "Ficaste do lado do vandalismo! A escola degradada afeta a todos. Danos sofridos!", success: false },
+                { name: "Ignorar pichagens nas paredes", dBoss: 0, dPlayer: 20, msg: "Ao ignorares, a escola fica cada vez mais degradada. Perdeste HP.", success: false }
+            ]
+        };
+
+        const bosses = [
+            {
+                name: "Espectro do Silêncio",
+                emoji: "🤫",
+                weakness: "Expressão",
+                weaknessClass: "Empático(a) Ativo(a)",
+                hp: 80,
+                maxHp: 80,
+                desc: "Este monstro assombra quem vê injustiças mas tem medo de falar, fazendo o bullying crescer em segredo.",
+                weaknessPool: "expressao",
+                altPool: "dialogo"
+            },
+            {
+                name: "Troll de Teclado",
+                emoji: "👹",
+                weakness: "Diálogo",
+                weaknessClass: "Defensor(a) Digital",
+                hp: 100,
+                maxHp: 100,
+                desc: "Este espectro espalha boatos e ofensas digitais anónimas no chat da turma para humilhar os colegas.",
+                weaknessPool: "dialogo",
+                altPool: "expressao"
+            },
+            {
+                name: "Gárgula da Depredação",
+                emoji: "🔨",
+                weakness: "Preservação",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 120,
+                maxHp: 120,
+                desc: "Este monstro alimenta-se da destruição física da escola, quebrando mesas, pichando paredes e estragando o património.",
+                weaknessPool: "preservacao",
+                altPool: "dialogo"
+            },
+            {
+                name: "Titã da Discórdia (CHEFÃO FINAL)",
+                emoji: "🐉",
+                weakness: "Comunicação",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 150,
+                maxHp: 150,
+                desc: "O maior perigo! Ele manipula discussões, promove vandalismo, espalha mentiras cruéis e tenta arruinar a escola.",
+                weaknessPool: "comunicacao",
+                altPool: "dialogo"
+            }
+        ];
+
+        const avataresDisponiveis = [
+            { emoji: "🦊", nome: "Fox" },
+            { emoji: "🐼", nome: "Panda" },
+            { emoji: "🐨", nome: "Koala" },
+            { emoji: "🦁", nome: "Lion" },
+            { emoji: "👾", nome: "Ghost" },
+            { emoji: "🦄", nome: "Unicorn" },
+            { emoji: "🦉", nome: "Owl" },
+            { emoji: "🐯", nome: "Tiger" }
+        ];
+
+        const classesDisponiveis = [
+            { nome: "Defensor(a) Digital", desc: "Especialista em detetar e neutralizar cyberbullying e ofensas virtuais no chat da escola.", icon: "💻", bonus: "Bónus contra Trolls" },
+            { nome: "Mediador(a) da Paz", desc: "Treinado(a) para ouvir os dois lados e resolver brigas físicas ou verbais de forma justa.", icon: "⚖️", bonus: "Bónus contra Titãs" },
+            { nome: "Empático(a) Ativo(a)", desc: "Mestre em acolher alunos solitários e curar o clima das salas de aula com afeto.", icon: "🧠", bonus: "Bónus contra Silêncio" }
+        ];
+
+        let selectedAvatarIdx = 0;
+        let selectedClassIdx = 0;
+
+        // ==========================================
+        // 2. INICIALIZAÇÃO SEGURA DO FIREBASE
+        // ==========================================
         function setOfflineFallback() {
             isFirebaseActive = false;
             const cloudIndicator = document.getElementById('cloud-indicator-dot');
@@ -37,7 +176,6 @@
             console.log("🎮 RPG a correr em modo de simulação local.");
         }
 
-        // Tentar iniciar conexão ao Firebase de modo seguro
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
@@ -59,7 +197,7 @@
                 } else {
                     if (!isInvestigador) {
                         signInAnonymously(auth).catch(err => {
-                            console.warn("Autenticação anónima bloqueada ou desativada no painel. A usar fallback offline.", err);
+                            console.warn("Autenticação anónima indisponível. A usar fallback offline.", err);
                             setOfflineFallback();
                         });
                     } else {
@@ -68,11 +206,13 @@
                 }
             });
         } catch (error) {
-            console.error("Erro na inicialização do Firebase. A carregar o modo de simulação local:", error);
+            console.error("Erro na inicialização do Firebase. Modo local ativado:", error);
             setOfflineFallback();
         }
 
-        // --- BUSCA PERFIL INVESTIGADOR ---
+        // ==========================================
+        // 3. FUNÇÕES DE AUTENTICAÇÃO E PERFIL
+        // ==========================================
         async function fetchInvestigatorProfile(uid) {
             if (!isFirebaseActive) return;
             try {
@@ -91,7 +231,6 @@
             }
         }
 
-        // --- VALIDAÇÃO DO CÓDIGO DA ESCOLA PELO ALUNO ---
         async function validateSchoolCode() {
             const inputVal = document.getElementById('input-school-code').value.trim();
             if (!inputVal) {
@@ -107,13 +246,13 @@
                     activeSchoolName = localSchool.institutionName;
                     proceedToStudentApp();
                     return;
-                } else if (inputVal.toUpperCase() === "2567@25") {
-                    activeSchoolCode = "2567@25";
-                    activeSchoolName = "Colégio 25";
+                } else if (inputVal.toUpperCase() === "2567@25" || inputVal.toUpperCase() === "2026@25") {
+                    activeSchoolCode = inputVal.toUpperCase();
+                    activeSchoolName = "Colégio 25 de Julho";
                     proceedToStudentApp();
                     return;
                 } else {
-                    showToast("⚠️", "Código offline não registado. Usa o código padrão: 2567@25");
+                    showToast("⚠️", "Código offline não registado. Usa o código padrão: 2026@25");
                     playBeepSound('error');
                     return;
                 }
@@ -133,9 +272,9 @@
                 }
             } catch (err) {
                 console.error("Erro ao validar código da escola (Usando Fallback):", err);
-                if (inputVal.toUpperCase() === "2567@25") {
-                    activeSchoolCode = "2567@25";
-                    activeSchoolName = "Colégio 25 (Demo)";
+                if (inputVal.toUpperCase() === "2567@25" || inputVal.toUpperCase() === "2026@25") {
+                    activeSchoolCode = inputVal.toUpperCase();
+                    activeSchoolName = "Colégio 25 de Julho (Demo)";
                     proceedToStudentApp();
                 } else {
                     showToast("⚠️", "Ligação instável e código local não reconhecido.");
@@ -158,7 +297,6 @@
             showToast("🏫", `Sessão escolar estabelecida no ${activeSchoolName}!`);
         }
 
-        // --- REGISTO DE INVESTIGADOR + ESCOLA (COM TRATAMENTO DE ERROS) ---
         async function registerInvestigador(event) {
             event.preventDefault();
 
@@ -209,7 +347,7 @@
             } catch (error) {
                 console.error("Erro ao criar conta no Firebase:", error);
                 if (error.code === 'auth/email-already-in-use') {
-                    showToast("❌", "E-mail já registado! Inicie sessão ou use outro e-mail.");
+                    showToast("⚠️", "Este e-mail já está em uso! Inicia sessão diretamente.");
                 } else {
                     showToast("❌", "Erro: " + error.message);
                 }
@@ -243,7 +381,6 @@
         }
         window.registerInvestigador = registerInvestigador;
 
-        // --- LOGIN & LOGOUT DO INVESTIGADOR ---
         async function loginInvestigador(event) {
             event.preventDefault();
             
@@ -263,7 +400,7 @@
                 isInvestigador = true;
                 document.getElementById('form-qg-login').reset();
             } catch (error) {
-                console.error("Erro de autenticação (A tentar login local...):", error);
+                console.warn("Autenticação Firebase falhou (Tentando fallback local...):", error);
                 performLocalLogin();
             }
 
@@ -279,11 +416,11 @@
                     showToast("🔑", "[Offline] Sessão iniciada com sucesso!");
                     playBeepSound('levelup');
                 } else if (email === "professor@escola.com" && password === "123456") {
-                    activeSchoolCode = "2567@25";
-                    activeSchoolName = "Colégio 25";
+                    activeSchoolCode = "2026@25";
+                    activeSchoolName = "Colégio 25 de Julho";
                     isInvestigador = true;
                     
-                    document.getElementById('qg-current-school-text').innerText = `Colégio 25 (Código: 2567@25) • Sincronizado por: Prof. Administrador [DEMO]`;
+                    document.getElementById('qg-current-school-text').innerText = `Colégio 25 de Julho (Código: 2026@25) • Sincronizado por: Prof. Administrador [DEMO]`;
                     toggleQGView(true);
                     showToast("🔑", "[Demo] Sessão iniciada com sucesso!");
                     playBeepSound('levelup');
@@ -353,7 +490,9 @@
         }
         window.toggleAuthSubTab = toggleAuthSubTab;
 
-        // --- SISTEMAS DE NAVEGAÇÃO DE ABAS ---
+        // ==========================================
+        // 4. SISTEMAS DE NAVEGAÇÃO E CUSTOMIZAÇÃO
+        // ==========================================
         window.switchTab = (tab) => {
             document.getElementById('sec-character').classList.add('hidden');
             document.getElementById('sec-game').classList.add('hidden');
@@ -374,211 +513,24 @@
             playBeepSound('success');
         };
 
-        // --- AUXILIARES LOCAIS ---
-        let soundEnabled = true;
         window.toggleSound = () => {
             soundEnabled = !soundEnabled;
             showToast(soundEnabled ? '🔊' : '🔇', soundEnabled ? 'Efeitos Sonoros Ligados' : 'Sons Desativados');
         };
+
         window.playBeepSound = (type) => {
             if (!soundEnabled) return;
             console.log("Som ativo:", type);
         };
+
         window.showToast = (emoji, msg) => {
             const toast = document.getElementById('toast');
+            if (!toast) return;
             document.getElementById('toast-icon').innerText = emoji;
             document.getElementById('toast-msg').innerText = msg;
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
         };
-
-        // --- TABELA DE TÁTICAS ROTATIVAS DO RPG ---
-        const poolTactics = {
-            dialogo: [
-                { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Escolha equilibrada! Propor o diálogo amigável quebra o ódio.", success: true },
-                { name: "Ouvir os dois lados", dBoss: 45, dPlayer: 0, msg: "Excelente escuta ativa! Entender as razões reduz as barreiras do espectro.", success: true },
-                { name: "Enviar Mensagem Construtiva", dBoss: 30, dPlayer: 0, msg: "Play positivo! Palavras de força e apoio anulam as ofensas.", success: true },
-                { name: "Gritar de volta", dBoss: 0, dPlayer: 25, msg: "Gritar e usar agressividade apenas alimenta a discórdia! Perdeste HP.", success: false },
-                { name: "Ignorar e Fugir", dBoss: 0, dPlayer: 20, msg: "Afastares-te sem agir de todo dá espaço para o conflito crescer. Perdeste HP.", success: false }
-            ],
-            expressao: [
-                { name: "Desabafar discretamente", dBoss: 45, dPlayer: 0, msg: "Decisão corajosa! Conversar com um adulto responsável dita a luz na situação.", success: true },
-                { name: "Convidar para o lanche", dBoss: 40, dPlayer: 0, msg: "Acolhimento perfeito! Trazer o colega excluído para o grupo quebra o silêncio.", success: true },
-                { name: "Denúncia Segura", dBoss: 35, dPlayer: 0, msg: "Uso exemplar da cidadania escolar! Comunicar de forma segura protege a turma.", success: true },
-                { name: "Apoiar a exclusão", dBoss: 0, dPlayer: 35, msg: "Mancada! Juntar-se ao silêncio cúmplice magoa a turma inteira. Sofreste danos graves.", success: false },
-                { name: "Guardar o segredo", dBoss: 0, dPlayer: 15, msg: "Esconder a verdade por medo acumula tensionamento e enfraquece a tua Vibe.", success: false }
-            ],
-            comunicacao: [
-                { name: "Aplicar Comunicação Não-Violenta", dBoss: 50, dPlayer: 0, msg: "Golpe de Mestre! Expressar sentimentos sem acusar desarma qualquer espectro.", success: true },
-                { name: "Reunir Mediação de Pares", dBoss: 40, dPlayer: 0, msg: "Liderança pura! Chamar os colegas mediadores resolveu o atrito.", success: true },
-                { name: "Praticar Círculo de Empatia", dBoss: 45, dPlayer: 0, msg: "Incrível! Fazer a turma partilhar vivências derrete o rancor do Titã.", success: true },
-                { name: "Planear uma Vingança", dBoss: 0, dPlayer: 40, msg: "Combate falhado! Tentar dar o troco cria um círculo infinito de raiva. Danos massivos sofridos!", success: false },
-                { name: "Espalhar fofoca reativa", dBoss: 0, dPlayer: 30, msg: "Falha de tática! Revidar com boatos destrói o clima escolar e fere a tua Vibe.", success: false }
-            ],
-            preservacao: [
-                { name: "Organizar Mutirão de Limpeza", dBoss: 50, dPlayer: 0, msg: "Trabalho de equipa espetacular! Reparar o que foi estragado desintegra a energia da Gárgula.", success: true },
-                { name: "Denúncia Segura e Rápida", dBoss: 40, dPlayer: 0, msg: "Cidadania ativa! Alertar a escola de forma responsável impede que mais coisas sejam destruídas.", success: true },
-                { name: "Oficina de Grafite Autorizado", dBoss: 45, dPlayer: 0, msg: "Criatividade fantástica! Canalizar a energia para arte urbana autorizada reconstrói a harmonia.", success: true },
-                { name: "Apoiar a destruição das mesas", dBoss: 0, dPlayer: 35, msg: "Ficaste do lado do vandalismo! A escola degradada afeta o teu bem-estar emocional. Danos sofridos!", success: false },
-                { name: "Ignorar pichagens nas paredes", dBoss: 0, dPlayer: 20, msg: "Ao ignorares, a escola fica cada vez mais suja e descuidada. Perdeste HP.", success: false }
-            ]
-        };
-
-        const bosses = [
-            {
-                name: "Espectro do Silêncio",
-                emoji: "🤫",
-                weakness: "Expressão",
-                weaknessClass: "Empático(a) Ativo(a)",
-                hp: 80,
-                maxHp: 80,
-                desc: "Este monstro assombra quem vê injustiças mas tem medo de falar, fazendo o bullying crescer em segredo.",
-                weaknessPool: "expressao",
-                altPool: "dialogo"
-            },
-            {
-                name: "Troll de Teclado",
-                emoji: "👹",
-                weakness: "Diálogo",
-                weaknessClass: "Defensor(a) Digital",
-                hp: 100,
-                maxHp: 100,
-                desc: "Este espectro espalha boatos e ofensas digitais anónimas no chat da turma para humilhar os colegas.",
-                weaknessPool: "dialogo",
-                altPool: "expressao"
-            },
-            {
-                name: "Gárgula da Depredação",
-                emoji: "🔨",
-                weakness: "Preservação",
-                weaknessClass: "Mediador(a) da Paz",
-                hp: 120,
-                maxHp: 120,
-                desc: "Este monstro alimenta-se da destruição física da escola, quebrando mesas, pichando paredes e estragando o património de todos.",
-                weaknessPool: "preservacao",
-                altPool: "dialogo"
-            },
-            {
-                name: "Titã da Discórdia (CHEFÃO FINAL)",
-                emoji: "🐉",
-                weakness: "Comunicação",
-                weaknessClass: "Mediador(a) da Paz",
-                hp: 150,
-                maxHp: 150,
-                desc: "O maior perigo! Ele manipula discussões, promove vandalismo, espalha mentiras cruéis e tenta arruinar a escola.",
-                weaknessPool: "comunicacao",
-                altPool: "dialogo"
-            }
-        ];
-
-        // --- SINCRONIZAÇÃO EM TEMPO REAL ---
-        function setupRealtimeSync() {
-            if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
-            if (unsubscribeCanvas) { unsubscribeCanvas(); unsubscribeCanvas = null; }
-
-            if (!isFirebaseActive || !currentUser) return;
-            if (!isInvestigador) return;
-
-            const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
-            unsubscribeReports = onSnapshot(reportsCol, (snapshot) => {
-                const cloudReports = [];
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.schoolCode === activeSchoolCode) {
-                        cloudReports.push(data);
-                    }
-                });
-                if (cloudReports.length > 0) {
-                    database.radarReports = cloudReports;
-                    if (isInvestigador) updateDashboard();
-                }
-            }, (err) => {
-                console.error("Erro na escuta dos relatos:", err);
-            });
-
-            if (!activeSchoolCode) return;
-
-            const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
-            unsubscribeCanvas = onSnapshot(canvasDoc, (docSnap) => {
-                if (docSnap.exists()) {
-                    database.canvas = docSnap.data();
-                    if (isInvestigador) renderCanvas();
-                }
-            }, (err) => {
-                console.error("Erro na escuta do canvas:", err);
-            });
-        }
-
-        // --- SUBMETER RELATÓRIO DO RADAR PARA A NUVEM ---
-        async function pushReportToCloud(report) {
-            if (!isFirebaseActive || !currentUser) return;
-            try {
-                const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
-                await addDoc(reportsCol, report);
-            } catch (err) {
-                console.error("Falha ao sincronizar com a nuvem:", err);
-            }
-        }
-
-        // --- SYNC COMPLETO DO CANVAS DE PLANEAMENTO ---
-        async function syncCanvasToCloud() {
-            if (!isFirebaseActive || !currentUser || !activeSchoolCode) return;
-            try {
-                const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
-                await setDoc(canvasDoc, database.canvas);
-            } catch (err) {
-                console.error("Erro ao atualizar o canvas online:", err);
-            }
-        }
-
-        // --- BASE DE DADOS LOCAL (In-Memory Fallback) ---
-        let database = {
-            player: {
-                nick: "Cyber Fox",
-                avatar: "🦊",
-                class: "Defensor(a) Digital",
-                level: 1,
-                xp: 25,
-                hp: 100,
-                citizenshipPoints: 0,
-                created: false,
-                schoolCode: ""
-            },
-            badges: ["🌱 Iniciante"],
-            radarReports: [
-                { space: "Sala de Aula", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
-                { space: "Pátio / Recreio", vibe: "neutro", incidents: ["Bullying ou Ofensas"], schoolCode: "2567@25" },
-                { space: "Casas de Banho", vibe: "preocupado", incidents: ["Vandalismo"], schoolCode: "2567@25" },
-                { space: "Quadra de Desportos", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
-                { space: "Entrada / Saída", vibe: "preocupado", incidents: ["Agressão Verbal"], schoolCode: "2567@25" }
-            ],
-            canvas: {
-                causas: ["📱 Pressão Digital e Perfis Anónimos", "💬 Falta de Diálogo e Escuta Ativa"],
-                solucoes: ["🕊️ Círculos de Construção de Paz", "🧠 Oficinas de Comunicação Não-Violenta"],
-                planos: ["📢 Patrulhas Amigáveis no Recreio", "📬 Caixa Física de Sugestões"]
-            }
-        };
-
-        // --- SISTEMAS DE CUSTOMIZAÇÃO DO HERÓI ---
-        const avataresDisponiveis = [
-            { emoji: "🦊", nome: "Fox" },
-            { emoji: "🐼", nome: "Panda" },
-            { emoji: "🐨", nome: "Koala" },
-            { emoji: "🦁", nome: "Lion" },
-            { emoji: "👾", nome: "Ghost" },
-            { emoji: "🦄", nome: "Unicorn" },
-            { emoji: "🦉", nome: "Owl" },
-            { emoji: "🐯", nome: "Tiger" }
-        ];
-
-        const classesDisponiveis = [
-            { nome: "Defensor(a) Digital", desc: "Especialista em detetar e neutralizar cyberbullying e ofensas virtuais no chat da escola.", icon: "💻", bonus: "Bónus contra Trolls" },
-            { nome: "Mediador(a) da Paz", desc: "Treinado(a) para ouvir os dois lados e resolver brigas físicas ou verbais de forma justa.", icon: "⚖️", bonus: "Bónus contra Titãs" },
-            { nome: "Empático(a) Ativo(a)", desc: "Mestre em acolher alunos solitários e curar o clima das salas de aula com afeto.", icon: "🧠", bonus: "Bónus contra Silêncio" }
-        ];
-
-        let selectedAvatarIdx = 0;
-        let selectedClassIdx = 0;
 
         function renderCharacterCreator() {
             const avsCont = document.getElementById('avatars-container');
@@ -670,12 +622,9 @@
         }
         window.confirmCharacter = confirmCharacter;
 
-        // --- SISTEMA DE COMBATE REAL DO RPG ---
-        let currentStageIdx = 0;
-        let playerHp = 100;
-        let currentBossHp = 0;
-        let currentTactics = [];
-
+        // ==========================================
+        // 5. SISTEMA DE COMBATE REAL DO RPG
+        // ==========================================
         function generateTurnTactics(boss) {
             const weaknessPool = poolTactics[boss.weaknessPool] || [];
             const altPool = poolTactics[boss.altPool] || [];
@@ -848,7 +797,9 @@
         }
         window.triggerCombatTurn = triggerCombatTurn;
 
-        // --- SISTEMA DE PROGRESSÃO ---
+        // ==========================================
+        // 6. SISTEMAS DE PROGRESSÃO E SINCRONIZAÇÃO EM TEMPO REAL
+        // ==========================================
         window.nextLevel = () => {
             currentStageIdx++;
             currentBossHp = 0;
@@ -881,7 +832,63 @@
             }
         };
 
-        // --- ATUALIZADORES DE LAYOUT DO INVESTIGADOR (DASHBOARD) ---
+        function setupRealtimeSync() {
+            if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
+            if (unsubscribeCanvas) { unsubscribeCanvas(); unsubscribeCanvas = null; }
+
+            if (!isFirebaseActive || !currentUser) return;
+            if (!isInvestigador) return;
+
+            const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
+            unsubscribeReports = onSnapshot(reportsCol, (snapshot) => {
+                const cloudReports = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.schoolCode === activeSchoolCode) {
+                        cloudReports.push(data);
+                    }
+                });
+                if (cloudReports.length > 0) {
+                    database.radarReports = cloudReports;
+                    if (isInvestigador) updateDashboard();
+                }
+            }, (err) => {
+                console.error("Erro na escuta dos relatos:", err);
+            });
+
+            if (!activeSchoolCode) return;
+
+            const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
+            unsubscribeCanvas = onSnapshot(canvasDoc, (docSnap) => {
+                if (docSnap.exists()) {
+                    database.canvas = docSnap.data();
+                    if (isInvestigador) renderCanvas();
+                }
+            }, (err) => {
+                console.error("Erro na escuta do canvas:", err);
+            });
+        }
+
+        async function pushReportToCloud(report) {
+            if (!isFirebaseActive || !currentUser) return;
+            try {
+                const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
+                await addDoc(reportsCol, report);
+            } catch (err) {
+                console.error("Falha ao sincronizar com a nuvem:", err);
+            }
+        }
+
+        async function syncCanvasToCloud() {
+            if (!isFirebaseActive || !currentUser || !activeSchoolCode) return;
+            try {
+                const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
+                await setDoc(canvasDoc, database.canvas);
+            } catch (err) {
+                console.error("Erro ao atualizar o canvas online:", err);
+            }
+        }
+
         function updateDashboard() {
             const radCont = document.getElementById('dashboard-radar-placeholder');
             if (radCont) {
@@ -933,4 +940,4 @@
         // Executa inicialização visual
         renderCharacterCreator();
         updateCharacterTabUI();
-    </script>
+</script>
