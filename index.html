@@ -1,12 +1,303 @@
-<script type="module">
-        // Importações modulares do Firebase
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convivência RPG - QG Escolar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }\n            50% { transform: translateX(5px) rotate(2deg); }\n            75% { transform: translateX(-5px) rotate(-1deg); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .hover-scale-102:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen">
+
+    <div id="toast" class="fixed top-4 right-4 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-lg hidden transform transition-all duration-300 z-50 flex items-center gap-2">
+        <span id="toast-icon">✨</span>
+        <span id="toast-msg" class="text-xs font-bold">Notificação</span>
+    </div>
+
+    <header class="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🛡️</span>
+                <div>
+                    <h1 class="font-black text-sm text-white tracking-wider uppercase">Convivência RPG</h1>
+                    <p class="text-[9px] text-slate-500 uppercase font-bold">Gamificação Ativa</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800/80">
+                    <span id="cloud-indicator-dot" class="w-2 h-2 rounded-full bg-amber-500 block"></span>
+                    <span id="cloud-indicator-text" class="text-[9px] font-black uppercase text-slate-400">A ligar...</span>
+                </div>
+                
+                <button onclick="toggleSound()" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:text-white transition-all text-xs">
+                    🔊 Som
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-slate-950 border-b border-slate-900/50 py-3">
+        <div class="max-w-md mx-auto px-4 flex gap-2">
+            <button onclick="switchTab('character')" class="flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+                ⛺ Herói
+            </button>
+            <button onclick="switchTab('game')" class="flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+                ⚔️ Campanha
+            </button>
+            <button onclick="switchTab('dashboard')" class="flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+                👁️ QG Investigador
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <section id="sec-school-gate" class="max-w-md mx-auto space-y-6">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center space-y-4">
+                <span class="text-4xl block">🏫</span>
+                <h2 class="text-lg font-black text-white">Portal da Convivência</h2>
+                <p class="text-xs text-slate-400 leading-relaxed">Introduz o código escolar da tua instituição para carregar a base de dados de convivência e começar a jogar.</p>
+                
+                <div class="space-y-2">
+                    <input type="text" id="input-school-code" placeholder="Ex: 2026@25" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-sm font-bold uppercase text-white focus:outline-none focus:border-indigo-500">
+                    <button onclick="validateSchoolCode()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg">
+                        Sincronizar Escola
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-character" class="hidden max-w-4xl mx-auto space-y-8">
+            <div id="character-school-badge" class="text-center text-[10px] uppercase font-black tracking-widest text-indigo-400"></div>
+
+            <div id="active-character-card" class="hidden max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center space-y-4 relative overflow-hidden">
+                <div class="absolute top-4 right-4">
+                    <button onclick="showEditCharacterForm()" class="text-[10px] font-bold text-slate-500 hover:text-white">✏️ Editar</button>
+                </div>
+                <div class="w-24 h-24 bg-slate-950 border border-slate-800 rounded-full flex items-center justify-center mx-auto">
+                    <span id="card-hero-avatar" class="text-4xl">🦊</span>
+                </div>
+                <div class="space-y-1">
+                    <h3 id="card-hero-nick" class="text-xl font-black text-white">Alcunha</h3>
+                    <p id="card-hero-class" class="text-xs text-indigo-400 font-bold">Classe</p>
+                </div>
+                <div class="flex justify-center gap-4 text-xs font-bold bg-slate-950 p-3 rounded-2xl border border-slate-800/60">
+                    <span id="card-hero-lvl">Lvl 1</span>
+                    <span id="card-hero-hp">HP: 100/100</span>
+                </div>
+                <button onclick="switchTab('game')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all">
+                    Iniciar Aventura de Convivência
+                </button>
+            </div>
+
+            <div id="character-creator-form" class="space-y-6">
+                <div class="text-center max-w-md mx-auto space-y-2">
+                    <h2 class="text-xl font-black text-white">Cria o teu Avatar Defensor</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Dá uma identidade ao teu agente da paz na escola.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
+                        <h3 class="text-white text-xs font-black uppercase tracking-wider">1. Nome e Visual</h3>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] uppercase font-bold text-slate-500">Alcunha / Codinome</label>
+                            <input type="text" id="input-nick" placeholder="Ex: Cyber Fox" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] uppercase font-bold text-slate-500">Escolha o Avatar</label>
+                            <div id="avatars-container" class="grid grid-cols-4 gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
+                        <h3 class="text-white text-xs font-black uppercase tracking-wider">2. Selecione a sua Classe de Ação</h3>
+                        <div id="classes-container" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button onclick="confirmCharacter()" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg">
+                        Confirmar e Entrar na Campanha 🛡️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-game" class="hidden space-y-8">
+            <div id="battleground-container" class="hidden max-w-2xl mx-auto space-y-6">
+                <div id="combat-card-element" class="bg-slate-900 border border-slate-800 p-6 rounded-3xl relative overflow-hidden">
+                    <h2 id="battle-boss-display-title" class="text-2xl font-black text-rose-500 text-center mb-2">Boss</h2>
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-center w-1/3 space-y-2">
+                            <div id="combat-profile-avatar" class="text-4xl">🦊</div>
+                            <div id="combat-profile-nick" class="font-bold text-xs text-white">Herói</div>
+                            <div id="combat-profile-class" class="text-[10px] text-slate-500">Classe</div>
+                            <div class="w-full bg-slate-850 rounded-full h-2.5 relative">
+                                <div id="battle-hero-hp-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 100%;"></div>
+                            </div>
+                            <span id="battle-hero-hp-text" class="text-[10px] font-bold text-emerald-400">100/100 HP</span>
+                        </div>
+
+                        <div class="text-3xl font-black text-slate-700">VS</div>
+
+                        <div class="text-center w-1/3 space-y-2">
+                            <div id="battle-boss-emoji" class="text-4xl">👾</div>
+                            <div id="battle-boss-name" class="font-bold text-xs text-rose-400">Vilão</div>
+                            <div id="battle-boss-weakness" class="text-[10px] text-rose-500/80 font-bold">Fraqueza</div>
+                            <div class="w-full bg-slate-850 rounded-full h-2.5 relative">
+                                <div id="battle-boss-hp-bar" class="bg-rose-500 h-2.5 rounded-full transition-all duration-500" style="width: 100%;"></div>
+                            </div>
+                            <span id="battle-boss-hp-text" class="text-[10px] font-bold text-rose-400">80/80 HP</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-850 mb-6">
+                        <p id="battle-boss-desc" class="text-xs text-slate-400 leading-relaxed text-center">Breve descrição do problema escolar.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h4 class="text-white text-xs font-black uppercase tracking-wider text-center">Selecione uma Tática de Convivência Saudável</h4>
+                        <div id="battle-actions-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2">
+                    <h5 class="text-[10px] uppercase font-black tracking-widest text-indigo-400">Histórico de Convivência</h5>
+                    <div id="battle-log" class="text-[11px] font-mono space-y-1.5 h-28 overflow-y-auto custom-scrollbar pr-2">
+                        <div class="text-indigo-400">[SISTEMA] O combate começou! Usa empatia e mediação.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="battle-victory-screen" class="hidden max-w-md mx-auto bg-slate-900 border border-emerald-500/20 p-8 rounded-3xl text-center space-y-6">
+                <span class="text-5xl block animate-bounce">🏆</span>
+                <h2 id="victory-title" class="text-2xl font-black text-emerald-400">Espectro Purificado!</h2>
+                <p id="victory-desc" class="text-xs text-slate-300 leading-relaxed">Boas escolhas éticas salvaguardam o bom ambiente na sala de aula.</p>
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                    <span class="block text-[10px] uppercase font-bold text-slate-500">Recompensa</span>
+                    <span id="battle-xp-reward" class="text-lg font-black text-indigo-400">+120 XP</span>
+                </div>
+                <button onclick="nextLevel()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all">
+                    Avançar para o Próximo Desafio
+                </button>
+            </div>
+
+            <div id="battle-defeat-screen" class="hidden max-w-md mx-auto bg-slate-900 border border-rose-500/20 p-8 rounded-3xl text-center space-y-6">
+                <span class="text-5xl block">⛺</span>
+                <h2 class="text-2xl font-black text-rose-500">Clima Escolar Tenso</h2>
+                <p class="text-xs text-slate-300 leading-relaxed">As tuas táticas falharam e a discórdia dominou. Mas não desistas, o diálogo é um processo de aprendizagem contínuo.</p>
+                <button onclick="retryCombat()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all">
+                    Tentar Novamente (Recuperar HP)
+                </button>
+            </div>
+        </section>
+
+        <section id="sec-dashboard" class="hidden space-y-8">
+            <div class="max-w-4xl mx-auto space-y-6">
+                
+                <div id="qg-auth-box" class="max-w-md mx-auto bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-6">
+                    <div class="text-center space-y-2">
+                        <span class="text-3xl block">👁️</span>
+                        <h2 class="text-lg font-black text-white">QG de Diagnóstico Escolar</h2>
+                        <p class="text-xs text-slate-400">Apenas para investigadores, professores e mediadores autorizados.</p>
+                    </div>
+
+                    <div class="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-850">
+                        <button id="btn-sub-login" onclick="toggleAuthSubTab('login')" class="flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all bg-indigo-600 text-white">Entrar</button>
+                        <button id="btn-sub-register" onclick="toggleAuthSubTab('register')" class="flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all text-slate-400 hover:text-white">Criar Conta</button>
+                    </div>
+
+                    <form id="form-qg-login" onsubmit="loginInvestigador(event)" class="space-y-4">
+                        <div id="auth-sub-login" class="space-y-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-500">E-mail</label>
+                                <input type="email" id="qg-email" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-500">Senha</label>
+                                <input type="password" id="qg-password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg">Entrar no Observatório</button>
+                        </div>
+                    </form>
+
+                    <form id="form-qg-register" onsubmit="registerInvestigador(event)" class="space-y-4 hidden">
+                        <div id="auth-sub-register" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-slate-500">Nome Completo</label>
+                                    <input type="text" id="reg-name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-slate-500">Cargo</label>
+                                    <input type="text" id="reg-role" placeholder="Ex: Professor" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-slate-500">Instituição</label>
+                                    <input type="text" id="reg-institution" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-slate-500">Código de Escola</label>
+                                    <input type="text" id="reg-school-code" required placeholder="Ex: COD@12" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-500">E-mail Profissional</label>
+                                <input type="email" id="reg-email" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-500">Senha (Min. 6 Carateres)</label>
+                                <input type="password" id="reg-password" required minlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg">Registar e Criar Observatório</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="qg-content-wrapper" class="hidden space-y-6">
+                    <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-3xl">
+                        <div class="space-y-1">
+                            <span class="text-[9px] font-black tracking-widest text-indigo-400 uppercase">Observatório Oficial</span>
+                            <h2 id="qg-current-school-text" class="text-sm font-bold text-white">Nenhum colégio sincronizado</h2>
+                        </div>
+                        <button onclick="logoutInvestigador()" class="px-4 py-2 bg-rose-950/40 border border-rose-500/20 rounded-xl text-rose-400 text-xs font-bold hover:bg-rose-500/10">Sair</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800">
+                            <h3 class="text-white text-sm font-bold mb-4">Radar de Clima por Setor</h3>
+                            <div id="dashboard-radar-placeholder" class="space-y-2"></div>
+                        </div>
+                        <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800">
+                            <h3 class="text-white text-sm font-bold mb-4">Canvas de Planeamento da Paz</h3>
+                            <div id="canvas-wrapper-ui" class="text-left text-xs space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ==========================================
-        // 1. DECLARAÇÃO DE TODAS AS VARIÁVEIS DE ESTADO (Prevenção de TDZ)
-        // ==========================================
         const firebaseConfig = {
           apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA", 
           authDomain: "cultura-de-respeito.firebaseapp.com",
@@ -16,6 +307,7 @@
           appId: "1:430540209879:web:8adfc67ca3e68918323a92"
         };
 
+        // Estado do Programa (Prevenção de Temporal Dead Zone)
         let app, auth, db;
         let isFirebaseActive = false;
         let currentUser = null;
@@ -27,13 +319,12 @@
         let unsubscribeCanvas = null;
         let soundEnabled = true;
 
-        // Estado do Combate e Progressão
+        // RPG Engine
         let currentStageIdx = 0;
         let playerHp = 100;
         let currentBossHp = 0;
         let currentTactics = [];
 
-        // Base de Dados Local / Simulador
         let database = {
             player: {
                 nick: "Cyber Fox",
@@ -61,7 +352,6 @@
             }
         };
 
-        // Dados estáticos do RPG
         const poolTactics = {
             dialogo: [
                 { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Escolha equilibrada! Propor o diálogo amigável quebra o ódio.", success: true },
@@ -160,9 +450,6 @@
         let selectedAvatarIdx = 0;
         let selectedClassIdx = 0;
 
-        // ==========================================
-        // 2. INICIALIZAÇÃO SEGURA DO FIREBASE
-        // ==========================================
         function setOfflineFallback() {
             isFirebaseActive = false;
             const cloudIndicator = document.getElementById('cloud-indicator-dot');
@@ -210,9 +497,6 @@
             setOfflineFallback();
         }
 
-        // ==========================================
-        // 3. FUNÇÕES DE AUTENTICAÇÃO E PERFIL
-        // ==========================================
         async function fetchInvestigatorProfile(uid) {
             if (!isFirebaseActive) return;
             try {
@@ -490,10 +774,8 @@
         }
         window.toggleAuthSubTab = toggleAuthSubTab;
 
-        // ==========================================
-        // 4. SISTEMAS DE NAVEGAÇÃO E CUSTOMIZAÇÃO
-        // ==========================================
         window.switchTab = (tab) => {
+            document.getElementById('sec-school-gate').classList.add('hidden');
             document.getElementById('sec-character').classList.add('hidden');
             document.getElementById('sec-game').classList.add('hidden');
             document.getElementById('sec-dashboard').classList.add('hidden');
@@ -613,8 +895,6 @@
             document.getElementById('combat-profile-nick').innerText = database.player.nick;
             document.getElementById('combat-profile-class').innerText = database.player.class;
 
-            document.getElementById('battle-hero-name').innerText = `Tu (${database.player.nick})`;
-
             playBeepSound('levelup');
             showToast("🎖️", "Herói desbloqueado com sucesso! Prepara-te para a campanha.");
             updateCharacterTabUI();
@@ -622,9 +902,6 @@
         }
         window.confirmCharacter = confirmCharacter;
 
-        // ==========================================
-        // 5. SISTEMA DE COMBATE REAL DO RPG
-        // ==========================================
         function generateTurnTactics(boss) {
             const weaknessPool = poolTactics[boss.weaknessPool] || [];
             const altPool = poolTactics[boss.altPool] || [];
@@ -693,7 +970,6 @@
             document.getElementById('battle-boss-desc').innerText = boss.desc;
 
             document.getElementById('battle-hero-hp-text').innerText = `${playerHp}/100 HP`;
-            document.getElementById('profile-hp').innerText = `HP: ${playerHp}/100`;
 
             document.getElementById('battle-boss-hp-bar').style.width = `${(currentBossHp / boss.maxHp) * 100}%`;
             document.getElementById('battle-hero-hp-bar').style.width = `${playerHp}%`;
@@ -797,9 +1073,6 @@
         }
         window.triggerCombatTurn = triggerCombatTurn;
 
-        // ==========================================
-        // 6. SISTEMAS DE PROGRESSÃO E SINCRONIZAÇÃO EM TEMPO REAL
-        // ==========================================
         window.nextLevel = () => {
             currentStageIdx++;
             currentBossHp = 0;
@@ -869,26 +1142,6 @@
             });
         }
 
-        async function pushReportToCloud(report) {
-            if (!isFirebaseActive || !currentUser) return;
-            try {
-                const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
-                await addDoc(reportsCol, report);
-            } catch (err) {
-                console.error("Falha ao sincronizar com a nuvem:", err);
-            }
-        }
-
-        async function syncCanvasToCloud() {
-            if (!isFirebaseActive || !currentUser || !activeSchoolCode) return;
-            try {
-                const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
-                await setDoc(canvasDoc, database.canvas);
-            } catch (err) {
-                console.error("Erro ao atualizar o canvas online:", err);
-            }
-        }
-
         function updateDashboard() {
             const radCont = document.getElementById('dashboard-radar-placeholder');
             if (radCont) {
@@ -937,7 +1190,8 @@
             }
         }
 
-        // Executa inicialização visual
         renderCharacterCreator();
         updateCharacterTabUI();
-</script>
+    </script>
+</body>
+</html>
