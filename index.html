@@ -37,10 +37,11 @@
             <span id="cloud-indicator-text" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Offline</span>
         </div>
 
-        <div class="flex gap-4 border-b border-slate-800 pb-4">
-            <button onclick="switchTab('character')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold">⛺ Caráter / Escola</button>
-            <button onclick="switchTab('game')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold">⚔️ Campanha de Combate</button>
-            <button onclick="switchTab('dashboard')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold">📡 QG Investigador</button>
+        <div class="flex gap-4 border-b border-slate-800 pb-4 overflow-x-auto">
+            <button onclick="switchTab('character')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold whitespace-nowrap">⛺ Caráter / Escola</button>
+            <button onclick="switchTab('mapping')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold whitespace-nowrap">🗺️ Diagnóstico Escolar</button>
+            <button onclick="switchTab('game')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold whitespace-nowrap">⚔️ Campanha de Combate</button>
+            <button onclick="switchTab('dashboard')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold whitespace-nowrap">📡 QG Investigador</button>
         </div>
 
         <section id="sec-school-gate" class="max-w-md mx-auto bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
@@ -90,6 +91,60 @@
             </div>
         </section>
 
+        <section id="sec-mapping" class="hidden max-w-xl mx-auto bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-6">
+            <div class="text-center">
+                <h3 class="text-xl font-black text-white">🗺️ Diagnóstico de Ambientes</h3>
+                <p class="text-xs text-slate-400 mt-1">Diz-nos anonimamente como te sentes nos espaços do teu colégio e ajuda a construir uma Cultura de Respeito!</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-xs text-indigo-400 font-bold uppercase tracking-wider">1. Seleciona o Ambiente da Escola:</label>
+                    <select id="map-space" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-bold">
+                        <option value="Sala de Aula">✏️ Sala de Aula</option>
+                        <option value="Pátio / Recreio">🌳 Pátio / Recreio</option>
+                        <option value="Casas de Banho">🧼 Casas de Banho</option>
+                        <option value="Refeitório / Cantina">🍕 Refeitório / Cantina</option>
+                        <option value="Quadra de Desportos">⚽ Quadra de Desportos</option>
+                        <option value="Corredores">🚪 Corredores</option>
+                        <option value="Entrada / Saída">🎒 Entrada / Saída</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs text-indigo-400 font-bold uppercase tracking-wider">2. Como te sentes a respeito deste lugar?</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="selectMapVibe('feliz', this)" class="map-vibe-btn p-3 bg-slate-950 border border-slate-800 hover:border-emerald-500 rounded-xl text-xs text-white font-bold flex items-center justify-center gap-2">
+                            😊 Bem / Seguro
+                        </button>
+                        <button type="button" onclick="selectMapVibe('preocupado', this)" class="map-vibe-btn p-3 bg-slate-950 border border-slate-800 hover:border-rose-500 rounded-xl text-xs text-white font-bold flex items-center justify-center gap-2">
+                            😢 Mal / Inseguro
+                        </button>
+                        <button type="button" onclick="selectMapVibe('neutro', this)" class="map-vibe-btn p-3 bg-slate-950 border border-slate-800 hover:border-slate-500 rounded-xl text-xs text-white font-bold flex items-center justify-center gap-2">
+                            😐 Indiferente
+                        </button>
+                        <button type="button" onclick="selectMapVibe('agitado', this)" class="map-vibe-btn p-3 bg-slate-950 border border-slate-800 hover:border-amber-500 rounded-xl text-xs text-white font-bold flex items-center justify-center gap-2">
+                            ⚡ Agitado / Tenso
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs text-indigo-400 font-bold uppercase tracking-wider">3. Qual é o conflito/delito mais visto aqui na tua opinião?</label>
+                    <select id="map-incident" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-bold">
+                        <option value="">✅ Nenhum (Clima pacífico e respeitoso)</option>
+                        <option value="Bullying ou Ofensas">💬 Bullying ou Ofensas Verbais</option>
+                        <option value="Exclusão Social">👤 Colegas Excluídos ou Ignorados</option>
+                        <option value="Vandalismo">🔨 Vandalismo ou Danos a Mesas/Paredes</option>
+                        <option value="Agressão Física">💥 Desrespeito Físico ou Brigas</option>
+                        <option value="Ofensas Digitais">📱 Ofensas e Boatos no Telemóvel</option>
+                    </select>
+                </div>
+
+                <button onclick="submitStudentMapping()" class="w-full py-3 mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all">Enviar Diagnóstico Anónimo 📡</button>
+            </div>
+        </section>
+
         <section id="sec-dashboard" class="hidden space-y-8">
             <div id="qg-auth-box" class="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-left">
                 <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
@@ -129,14 +184,31 @@
                     <button onclick="logoutInvestigador()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-all">Sair 🔒</button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center text-slate-500">
-                    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800">
-                        <h3 class="text-white text-sm font-bold mb-4">Mapeamento de Radar Ativo</h3>
-                        <div id="dashboard-radar-placeholder" class="text-xs space-y-2"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-slate-500">
+                    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-white text-sm font-bold mb-4">📊 Análise de Ambientes da Escola (Anónimo)</h3>
+                            <div id="dashboard-radar-placeholder" class="text-xs space-y-3"></div>
+                        </div>
                     </div>
-                    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800">
-                        <h3 class="text-white text-sm font-bold mb-4">Canvas de Planeamento da Paz</h3>
-                        <div id="canvas-wrapper-ui" class="text-left text-xs space-y-4"></div>
+                    
+                    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4 text-left">
+                        <h3 class="text-white text-sm font-bold">📋 Plano de Intervenção Estratégica</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-[11px] text-slate-400 font-bold block mb-1">🔍 Qual a fonte do problema no local mais "votado"?</label>
+                                <textarea id="plan-source" rows="2" placeholder="Ex: Falta de supervisão de adultos no pátio durante o intervalo ou pontos cegos..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 font-bold block mb-1">💡 Qual a melhor solução para o delito mais "votado"?</label>
+                                <textarea id="plan-solution" rows="2" placeholder="Ex: Criação de patrulhas de apoio e gincanas cooperativas..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 font-bold block mb-1">🚀 Como poderá ser colocado em prática (Passo a passo)?</label>
+                                <textarea id="plan-practice" rows="2" placeholder="Ex: 1. Conversar com a direção; 2. Formar equipas de alunos; 3. Implementar na próxima segunda..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none"></textarea>
+                            </div>
+                            <button onclick="saveSchoolActionPlan()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all">💾 Guardar Plano de Ação</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -194,20 +266,19 @@
     </main>
 
     <script type="module">
-        // Importações modulares do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO FIREBASE (Apenas placeholders - roda em fallback offline por padrão se não ligar)
         const firebaseConfig = {
-  apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA",
-  authDomain: "cultura-de-respeito.firebaseapp.com",
-  projectId: "cultura-de-respeito",
-  storageBucket: "cultura-de-respeito.firebasestorage.app",
-  messagingSenderId: "430540209879",
-  appId: "1:430540209879:web:8adfc67ca3e68918323a92"
-};
+            apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA",
+            authDomain: "cultura-de-respeito.firebaseapp.com",
+            projectId: "cultura-de-respeito",
+            storageBucket: "cultura-de-respeito.firebasestorage.app",
+            messagingSenderId: "430540209879",
+            appId: "1:430540209879:web:8adfc67ca3e68918323a92"
+        };
+
         let app, auth, db;
         let isFirebaseActive = false;
         let currentUser = null;
@@ -216,9 +287,9 @@
         let activeSchoolName = "";
         let appId = "cadastro_geral";
         let unsubscribeReports = null;
-        let unsubscribeCanvas = null;
+        let unsubscribePlans = null;
+        let selectedMapVibeValue = "";
 
-        // Tentar iniciar conexão ao Firebase de modo seguro
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
@@ -249,7 +320,6 @@
             if (cloudText) cloudText.innerText = "Offline";
         }
 
-        // --- BUSCA PERFIL INVESTIGADOR ---
         async function fetchInvestigatorProfile(uid) {
             try {
                 const docRef = doc(db, 'usuarios', appId, 'public', 'data', 'investigators', uid);
@@ -267,7 +337,6 @@
             }
         }
 
-        // --- VALIDAÇÃO DO CÓDIGO DA ESCOLA PELO ALUNO ---
         async function validateSchoolCode() {
             const inputVal = document.getElementById('input-school-code').value.trim();
             if (!inputVal) {
@@ -317,19 +386,122 @@
 
         function proceedToStudentApp() {
             database.player.schoolCode = activeSchoolCode;
+            
+            // SOME COM O ELEMENTO TOTALMENTE ASSIM QUE ADICIONADO COM SUCESSO!
+            document.getElementById('sec-school-gate').style.display = 'none';
             document.getElementById('sec-school-gate').classList.add('hidden');
+            
             document.getElementById('sec-character').classList.remove('hidden');
             document.getElementById('character-school-badge').innerText = `Sincronizado: ${activeSchoolName}`;
             
-            // Corrige os perfis laterais
             document.getElementById('card-hero-nick').innerText = database.player.nick;
             document.getElementById('card-hero-hp').innerText = `HP: ${playerHp}/100`;
 
             playBeepSound('levelup');
             showToast("🏫", `Sessão escolar estabelecida no ${activeSchoolName}!`);
+            setupRealtimeSync();
         }
 
-        // --- REGISTO DE INVESTIGADOR + ESCOLA (COM SUPORTE OFFLINE) ---
+        // --- SUBMETER MAPEAMENTO ANÓNIMO DO ESTUDANTE ---
+        window.selectMapVibe = (vibe, btn) => {
+            selectedMapVibeValue = vibe;
+            document.querySelectorAll('.map-vibe-btn').forEach(b => {
+                b.classList.remove('border-emerald-500', 'border-rose-500', 'border-slate-500', 'border-amber-500', 'bg-indigo-500/10');
+            });
+            let borderClass = 'border-slate-500';
+            if (vibe === 'feliz') borderClass = 'border-emerald-500';
+            if (vibe === 'preocupado') borderClass = 'border-rose-500';
+            if (vibe === 'agitado') borderClass = 'border-amber-500';
+            btn.classList.add(borderClass, 'bg-indigo-500/10');
+            playBeepSound('success');
+        };
+
+        async function submitStudentMapping() {
+            if (!activeSchoolCode) {
+                showToast("⚠️", "Deves sincronizar primeiro o código da tua escola na aba 'Caráter'!");
+                playBeepSound('error');
+                return;
+            }
+
+            const space = document.getElementById('map-space').value;
+            const incident = document.getElementById('map-incident').value;
+
+            if (!selectedMapVibeValue) {
+                showToast("⚠️", "Seleciona como te sentes em relação a esse ambiente!");
+                playBeepSound('error');
+                return;
+            }
+
+            const incidentList = incident ? [incident] : [];
+            const newReport = {
+                space: space,
+                vibe: selectedMapVibeValue,
+                incidents: incidentList,
+                schoolCode: activeSchoolCode,
+                timestamp: new Date().toISOString()
+            };
+
+            // Guarda localmente primeiro
+            database.radarReports.push(newReport);
+
+            if (isFirebaseActive) {
+                await pushReportToCloud(newReport);
+            }
+
+            showToast("📡", "Diagnóstico anónimo submetido com sucesso ao QG!");
+            playBeepSound('levelup');
+
+            // Limpa o formulário
+            selectedMapVibeValue = "";
+            document.querySelectorAll('.map-vibe-btn').forEach(b => {
+                b.classList.remove('border-emerald-500', 'border-rose-500', 'border-slate-500', 'border-amber-500', 'bg-indigo-500/10');
+            });
+            document.getElementById('map-incident').value = "";
+            
+            // Redireciona para o combate
+            switchTab('game');
+        }
+        window.submitStudentMapping = submitStudentMapping;
+
+        // --- SALVAR PLANO DE ACÇÃO NO CLOUD DATABASE ---
+        async function saveSchoolActionPlan() {
+            if (!isInvestigador || !activeSchoolCode) {
+                showToast("⚠️", "Inicia sessão no QG para poderes guardar planos estratégicos.");
+                playBeepSound('error');
+                return;
+            }
+
+            const source = document.getElementById('plan-source').value.trim();
+            const solution = document.getElementById('plan-solution').value.trim();
+            const practice = document.getElementById('plan-practice').value.trim();
+
+            const planData = {
+                source: source,
+                solution: solution,
+                practice: practice,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (!isFirebaseActive) {
+                if (!window.offlinePlans) window.offlinePlans = {};
+                window.offlinePlans[activeSchoolCode] = planData;
+                showToast("💾", "[Offline] Plano guardado no navegador!");
+                playBeepSound('levelup');
+                return;
+            }
+
+            try {
+                const docRef = doc(db, 'usuarios', appId, 'public', 'data', 'school_plans', activeSchoolCode);
+                await setDoc(docRef, planData);
+                showToast("💾", "Plano de Ação guardado na nuvem do colégio!");
+                playBeepSound('levelup');
+            } catch (err) {
+                console.error("Erro ao salvar plano:", err);
+                showToast("❌", "Erro ao gravar dados no Firebase.");
+            }
+        }
+        window.saveSchoolActionPlan = saveSchoolActionPlan;
+
         async function registerInvestigador(event) {
             event.preventDefault();
 
@@ -406,7 +578,6 @@
         }
         window.registerInvestigador = registerInvestigador;
 
-        // --- LOGIN & LOGOUT DO INVESTIGADOR (COM SUPORTE OFFLINE) ---
         async function loginInvestigador(event) {
             event.preventDefault();
             
@@ -454,7 +625,7 @@
 
         async function logoutInvestigador() {
             if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
-            if (unsubscribeCanvas) { unsubscribeCanvas(); unsubscribeCanvas = null; }
+            if (unsubscribePlans) { unsubscribePlans(); unsubscribePlans = null; }
 
             isInvestigador = false;
             toggleQGView(false);
@@ -482,7 +653,6 @@
                 loginCard.classList.add('hidden');
                 contentWrapper.classList.remove('hidden');
                 updateDashboard();
-                renderCanvas();
             } else {
                 loginCard.classList.remove('hidden');
                 contentWrapper.classList.add('hidden');
@@ -510,9 +680,9 @@
         }
         window.toggleAuthSubTab = toggleAuthSubTab;
 
-        // --- SISTEMAS DE NAVEGAÇÃO DE ABAS ---
         window.switchTab = (tab) => {
             document.getElementById('sec-character').classList.add('hidden');
+            document.getElementById('sec-mapping').classList.add('hidden');
             document.getElementById('sec-game').classList.add('hidden');
             document.getElementById('sec-dashboard').classList.add('hidden');
 
@@ -522,6 +692,8 @@
                 } else {
                     document.getElementById('sec-character').classList.remove('hidden');
                 }
+            } else if (tab === 'mapping') {
+                document.getElementById('sec-mapping').classList.remove('hidden');
             } else if (tab === 'game') {
                 document.getElementById('sec-game').classList.remove('hidden');
                 loadCombatStage();
@@ -531,7 +703,6 @@
             playBeepSound('success');
         };
 
-        // --- AUXILIARES LOCAIS ---
         let soundEnabled = true;
         window.toggleSound = () => {
             soundEnabled = !soundEnabled;
@@ -549,7 +720,6 @@
             setTimeout(() => toast.classList.add('hidden'), 3000);
         };
 
-        // --- TABELA DE TÁTICAS ROTATIVAS DO RPG ---
         const poolTactics = {
             dialogo: [
                 { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Escolha equilibrada! Propor o diálogo amigável quebra o ódio.", success: true },
@@ -628,13 +798,11 @@
             }
         ];
 
-        // --- SINCRONIZAÇÃO EM TEMPO REAL ---
         function setupRealtimeSync() {
             if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
-            if (unsubscribeCanvas) { unsubscribeCanvas(); unsubscribeCanvas = null; }
+            if (unsubscribePlans) { unsubscribePlans(); unsubscribePlans = null; }
 
-            if (!isFirebaseActive || !currentUser) return;
-            if (!isInvestigador) return;
+            if (!isFirebaseActive || !activeSchoolCode) return;
 
             const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
             unsubscribeReports = onSnapshot(reportsCol, (snapshot) => {
@@ -653,20 +821,20 @@
                 console.error("Erro na escuta dos relatos:", err);
             });
 
-            if (!activeSchoolCode) return;
-
-            const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
-            unsubscribeCanvas = onSnapshot(canvasDoc, (docSnap) => {
+            // ESCUTA E SINCRONIZA O PLANO DE ACÇÃO EM TEMPO REAL NO QG
+            const planDocRef = doc(db, 'usuarios', appId, 'public', 'data', 'school_plans', activeSchoolCode);
+            unsubscribePlans = onSnapshot(planDocRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    database.canvas = docSnap.data();
-                    if (isInvestigador) renderCanvas();
+                    const data = docSnap.data();
+                    document.getElementById('plan-source').value = data.source || "";
+                    document.getElementById('plan-solution').value = data.solution || "";
+                    document.getElementById('plan-practice').value = data.practice || "";
                 }
             }, (err) => {
-                console.error("Erro na escuta do canvas:", err);
+                console.error("Erro na escuta dos planos:", err);
             });
         }
 
-        // --- SUBMETER RELATÓRIO DO RADAR PARA A NUVEM ---
         async function pushReportToCloud(report) {
             if (!isFirebaseActive || !currentUser) return;
             try {
@@ -677,18 +845,6 @@
             }
         }
 
-        // --- SYNC COMPLETO DO CANVAS DE PLANEAMENTO ---
-        async function syncCanvasToCloud() {
-            if (!isFirebaseActive || !currentUser || !activeSchoolCode) return;
-            try {
-                const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
-                await setDoc(canvasDoc, database.canvas);
-            } catch (err) {
-                console.error("Erro ao atualizar o canvas online:", err);
-            }
-        }
-
-        // --- BASE DE DADOS LOCAL (In-Memory Fallback) ---
         let database = {
             player: {
                 nick: "Cyber Fox",
@@ -708,15 +864,9 @@
                 { space: "Casas de Banho", vibe: "preocupado", incidents: ["Vandalismo"], schoolCode: "2567@25" },
                 { space: "Quadra de Desportos", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
                 { space: "Entrada / Saída", vibe: "preocupado", incidents: ["Agressão Verbal"], schoolCode: "2567@25" }
-            ],
-            canvas: {
-                causas: ["📱 Pressão Digital e Perfis Anónimos", "💬 Falta de Diálogo e Escuta Ativa"],
-                solucoes: ["🕊️ Círculos de Construção de Paz", "🧠 Oficinas de Comunicação Não-Violenta"],
-                planos: ["📢 Patrulhas Amigáveis no Recreio", "📬 Caixa Física de Sugestões"]
-            }
+            ]
         };
 
-        // --- SISTEMAS DE CUSTOMIZAÇÃO DO HERÓI ---
         const avataresDisponiveis = [
             { emoji: "🦊", nome: "Fox" },
             { emoji: "🐼", nome: "Panda" },
@@ -814,7 +964,6 @@
             database.player.class = classesDisponiveis[selectedClassIdx].nome;
             database.player.created = true;
 
-            // Altera displays no topo e combate
             document.getElementById('combat-profile-avatar').innerText = database.player.avatar;
             document.getElementById('combat-profile-nick').innerText = database.player.nick;
             document.getElementById('combat-profile-class').innerText = database.player.class;
@@ -824,11 +973,10 @@
             playBeepSound('levelup');
             showToast("🎖️", "Herói desbloqueado com sucesso! Prepara-te para a campanha.");
             updateCharacterTabUI();
-            switchTab('game');
+            switchTab('mapping'); // Encaminha para a nova aba de mapeamento primeiro!
         }
         window.confirmCharacter = confirmCharacter;
 
-        // --- SISTEMA DE COMBATE REAL DO RPG ---
         let currentStageIdx = 0;
         let playerHp = 100;
         let currentBossHp = 0;
@@ -837,7 +985,6 @@
         function generateTurnTactics(boss) {
             const weaknessPool = poolTactics[boss.weaknessPool] || [];
             const altPool = poolTactics[boss.altPool] || [];
-            // Mistura duas táticas da fraqueza com duas alternativas aleatórias
             const selected = [
                 ...weaknessPool.slice(0, 2),
                 ...altPool.slice(0, 2)
@@ -1007,10 +1154,9 @@
         }
         window.triggerCombatTurn = triggerCombatTurn;
 
-        // --- SISTEMA DE PROVÉM DE CRITÉRIOS DE PROGRESSÃO ---
         window.nextLevel = () => {
             currentStageIdx++;
-            currentBossHp = 0; // Reinicia para carregar o novo HP
+            currentBossHp = 0;
             document.getElementById('battle-victory-screen').classList.add('hidden');
             loadCombatStage();
         };
@@ -1040,56 +1186,99 @@
             }
         };
 
-        // --- ATUALIZADORES DE LAYOUT DO INVESTIGADOR (DASHBOARD) ---
+        // --- CÁLCULO DINÂMICO E VISUAL DO RADAR ANÓNIMO NO QG (DASHBOARD) ---
         function updateDashboard() {
             const radCont = document.getElementById('dashboard-radar-placeholder');
-            if (radCont) {
-                radCont.innerHTML = '';
-                database.radarReports.forEach(rep => {
+            if (!radCont) return;
+
+            radCont.innerHTML = '';
+
+            const totalVotes = database.radarReports.length;
+            if (totalVotes === 0) {
+                radCont.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">Nenhum dado recebido até ao momento.</p>`;
+                return;
+            }
+
+            // Agrupa votos por ambiente
+            const environmentVotes = {};
+            // Agrupa os incidentes/delitos citados
+            const incidentCounts = {};
+
+            database.radarReports.forEach(rep => {
+                environmentVotes[rep.space] = (environmentVotes[rep.space] || 0) + 1;
+                
+                if (rep.incidents && rep.incidents.length > 0) {
+                    rep.incidents.forEach(inc => {
+                        if (inc) {
+                            incidentCounts[inc] = (incidentCounts[inc] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            // Cria o Cabeçalho com dados anónimos resumidos
+            const statsHeader = document.createElement('div');
+            statsHeader.className = "mb-4 bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-indigo-400 font-bold flex justify-between";
+            statsHeader.innerHTML = `
+                <span>Total de Diagnósticos: ${totalVotes}</span>
+                <span>Anónimo • Protegido 🔒</span>
+            `;
+            radCont.appendChild(statsHeader);
+
+            // Secção 1: Ambientes mais Ativos/Votados
+            const titleEnv = document.createElement('h4');
+            titleEnv.className = "text-[11px] text-white font-black uppercase mb-2";
+            titleEnv.innerText = "Frequência por Espaço Escolar:";
+            radCont.appendChild(titleEnv);
+
+            Object.keys(environmentVotes).forEach(env => {
+                const qty = environmentVotes[env];
+                const pct = Math.round((qty / totalVotes) * 100);
+
+                const el = document.createElement('div');
+                el.className = "space-y-1 mb-3";
+                el.innerHTML = `
+                    <div class="flex justify-between text-[10px] font-bold text-slate-300">
+                        <span>📍 ${env}</span>
+                        <span>${qty} votos (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                        <div class="bg-indigo-600 h-2.5 rounded-full transition-all" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                radCont.appendChild(el);
+            });
+
+            // Secção 2: Delitos Reportados
+            const titleDel = document.createElement('h4');
+            titleDel.className = "text-[11px] text-white font-black uppercase mt-4 mb-2";
+            titleDel.innerText = "Perceção de Conflitos / Delitos mais votados:";
+            radCont.appendChild(titleDel);
+
+            const incidentsKeys = Object.keys(incidentCounts);
+            if (incidentsKeys.length === 0) {
+                radCont.innerHTML += `<p class="text-[10px] text-emerald-400 font-bold">✓ Todos os alunos reportaram ambiente 100% pacífico.</p>`;
+            } else {
+                incidentsKeys.forEach(inc => {
+                    const qty = incidentCounts[inc];
+                    const pct = Math.round((qty / totalVotes) * 100);
+
                     const el = document.createElement('div');
-                    el.className = "flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-left text-[11px]";
-                    const isOk = rep.incidents.length === 0;
+                    el.className = "space-y-1 mb-3";
                     el.innerHTML = `
-                        <div>
-                            <span class="font-bold text-white">${rep.space}</span>
-                            <span class="block text-[9px] text-slate-500">${isOk ? 'Clima Calmo' : 'Alerta: ' + rep.incidents.join(', ')}</span>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-300">
+                            <span>⚠️ ${inc}</span>
+                            <span>${qty} citações (${pct}%)</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isOk ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">
-                            ${rep.vibe.toUpperCase()}
-                        </span>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                            <div class="bg-rose-500 h-2.5 rounded-full transition-all" style="width: ${pct}%"></div>
+                        </div>
                     `;
                     radCont.appendChild(el);
                 });
             }
         }
 
-        function renderCanvas() {
-            const wrapper = document.getElementById('canvas-wrapper-ui');
-            if (wrapper) {
-                wrapper.innerHTML = `
-                    <div>
-                        <span class="font-bold text-white block mb-1">Causas Identificadas:</span>
-                        <ul class="list-disc list-inside text-slate-400 space-y-1">
-                            ${database.canvas.causas.map(c => `<li>${c}</li>`).join('')}
-                        </ul>
-                    </div>
-                    <div>
-                        <span class="font-bold text-white block mb-1">Soluções Ativas:</span>
-                        <ul class="list-disc list-inside text-slate-400 space-y-1">
-                            ${database.canvas.solucoes.map(s => `<li>${s}</li>`).join('')}
-                        </ul>
-                    </div>
-                    <div>
-                        <span class="font-bold text-white block mb-1">Plano de Ação Escolar:</span>
-                        <ul class="list-disc list-inside text-slate-400 space-y-1">
-                            ${database.canvas.planos.map(p => `<li>${p}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
-        }
-
-        // Executa inicialização visual
         renderCharacterCreator();
         updateCharacterTabUI();
     </script>
