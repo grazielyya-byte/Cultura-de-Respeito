@@ -153,4 +153,952 @@
                             <div id="combat-profile-nick" class="font-bold text-xs text-white">Herói</div>
                             <div id="combat-profile-class" class="text-[10px] text-slate-500 mb-2">Classe</div>
                             <div class="w-full bg-slate-800 rounded-full h-3"><div id="battle-hero-hp-bar" class="bg-emerald-500 h-3 rounded-full" style="width: 100%"></div></div>
-                            <div id="battle-hero-hp-text" class="
+                            <div id="battle-hero-hp-text" class="text-xs font-bold mt-1">100/100 HP</div>
+                            <div id="battle-hero-name" class="hidden"></div>
+                            <div id="profile-hp" class="hidden"></div>
+                        </div>
+                        
+                        <div class="text-2xl font-black text-slate-600">VS</div>
+                        
+                        <div class="text-center w-1/3">
+                            <div id="battle-boss-emoji" class="text-4xl mb-2">👿</div>
+                            <div id="battle-boss-name" class="font-bold text-xs text-white">Boss</div>
+                            <div id="battle-boss-weakness" class="text-[10px] text-indigo-400 font-bold mb-2">Fraqueza</div>
+                            <div class="w-full bg-slate-800 rounded-full h-3"><div id="battle-boss-hp-bar" class="bg-rose-500 h-3 rounded-full" style="width: 100%"></div></div>
+                            <div id="battle-boss-hp-text" class="text-xs font-bold mt-1">100/100 HP</div>
+                        </div>
+                    </div>
+                    
+                    <p id="battle-boss-desc" class="text-xs text-center text-slate-400 mb-6"></p>
+
+                    <div id="battle-actions-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"></div>
+                    
+                    <div id="battle-log" class="bg-slate-950 border border-slate-800 h-32 rounded-xl p-3 overflow-y-auto text-[11px] space-y-2 custom-scrollbar"></div>
+                </div>
+            </div>
+
+            <section id="battle-victory-screen" class="hidden max-w-md mx-auto text-center space-y-4 bg-emerald-900/20 border border-emerald-500/30 p-8 rounded-3xl">
+                <h2 id="victory-title" class="text-3xl font-black text-emerald-400">Vitória!</h2>
+                <p id="victory-desc" class="text-sm text-slate-300"></p>
+                <div id="battle-xp-reward" class="text-xl font-bold text-yellow-400"></div>
+                <button onclick="nextLevel()" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl">Avançar Jornada 🧭</button>
+            </section>
+
+            <section id="battle-defeat-screen" class="hidden max-w-md mx-auto text-center space-y-4 bg-rose-900/20 border border-rose-500/30 p-8 rounded-3xl">
+                <h2 class="text-3xl font-black text-rose-400">Derrota...</h2>
+                <p class="text-sm text-slate-300">A tua energia emocional esgotou-se. Precisa de descansar e tentar outras abordagens.</p>
+                <button onclick="retryCombat()" class="w-full py-3 bg-rose-600 text-white font-bold rounded-xl">Tentar Novamente ⚔️</button>
+            </section>
+        </section>
+
+    </main>
+
+    <script type="module">
+        // Importações modulares do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // CONFIGURAÇÃO FIREBASE
+        const firebaseConfig = {
+          apiKey: "AIzaSyDepSHnoC3LrNXo-ajsZ8JRex_K7in0GXA",
+          authDomain: "cultura-de-respeito.firebaseapp.com",
+          projectId: "cultura-de-respeito",
+          storageBucket: "cultura-de-respeito.firebasestorage.app",
+          messagingSenderId: "430540209879",
+          appId: "1:430540209879:web:8adfc67ca3e68918323a92"
+        };
+        let app, auth, db;
+        let isFirebaseActive = false;
+        let currentUser = null;
+        let isInvestigador = false;
+        let activeSchoolCode = "";
+        let activeSchoolName = "";
+        let appId = "cadastro_geral";
+        let unsubscribeReports = null;
+        let unsubscribeCanvas = null;
+
+        // Tentar iniciar conexão ao Firebase de modo seguro
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            isFirebaseActive = true;
+            
+            const cloudIndicator = document.getElementById('cloud-indicator-dot');
+            const cloudText = document.getElementById('cloud-indicator-text');
+            if (cloudIndicator) cloudIndicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 block";
+            if (cloudText) cloudText.innerText = "Online";
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    // Se o utilizador tem sessão ativa e não marcámos localmente como investigador, valida se é um
+                    if (!isInvestigador) {
+                        fetchInvestigatorProfile(user.uid);
+                    }
+                    setupRealtimeSync();
+                } else {
+                    // Só tenta o login anónimo se NÃO for investigador ativo (para evitar loops no logout)
+                    if (!isInvestigador) {
+                        signInAnonymously(auth).catch(err => console.error("Anónimo falhou:", err));
+                    } else {
+                        currentUser = null;
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Modo Offline Ativo. Detalhes: ", error);
+            const cloudIndicator = document.getElementById('cloud-indicator-dot');
+            const cloudText = document.getElementById('cloud-indicator-text');
+            if (cloudIndicator) cloudIndicator.className = "w-2.5 h-2.5 rounded-full bg-rose-500 block";
+            if (cloudText) cloudText.innerText = "Offline";
+        }
+
+        // --- BUSCA PERFIL INVESTIGADOR ---
+        async function fetchInvestigatorProfile(uid) {
+            try {
+                const docRef = doc(db, 'usuarios', appId, 'public', 'data', 'investigators', uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    activeSchoolCode = data.schoolCode;
+                    activeSchoolName = data.institution;
+                    isInvestigador = true;
+                    document.getElementById('qg-current-school-text').innerText = `${data.institution} (Código: ${data.schoolCode}) • Sincronizado por: ${data.name} (${data.role})`;
+                    toggleQGView(true);
+                }
+            } catch (err) {
+                console.error("Erro ao procurar dados do investigador:", err);
+            }
+        }
+
+        // --- VALIDAÇÃO DO CÓDIGO DA ESCOLA PELO ALUNO ---
+        async function validateSchoolCode() {
+            const inputVal = document.getElementById('input-school-code').value.trim();
+            if (!inputVal) {
+                showToast("⚠️", "Insere o código escolar fornecido pelo teu colégio!");
+                playBeepSound('error');
+                return;
+            }
+
+            if (!isFirebaseActive) {
+                if (window.offlineSchools && window.offlineSchools[inputVal.toUpperCase()]) {
+                    const localSchool = window.offlineSchools[inputVal.toUpperCase()];
+                    activeSchoolCode = localSchool.code;
+                    activeSchoolName = localSchool.institutionName;
+                    proceedToStudentApp();
+                    return;
+                } else if (inputVal.toUpperCase() === "2567@25") {
+                    activeSchoolCode = "2567@25";
+                    activeSchoolName = "Colégio 25";
+                    proceedToStudentApp();
+                    return;
+                } else {
+                    showToast("⚠️", "Código offline não registado de momento. Regista a escola primeiro ou usa: 2567@25");
+                    playBeepSound('error');
+                    return;
+                }
+            }
+
+            try {
+                const schoolRef = doc(db, 'usuarios', appId, 'public', 'data', 'schools', inputVal.toUpperCase());
+                const schoolSnap = await getDoc(schoolRef);
+
+                if (schoolSnap.exists()) {
+                    activeSchoolCode = inputVal.toUpperCase();
+                    activeSchoolName = schoolSnap.data().institutionName;
+                    proceedToStudentApp();
+                } else {
+                    showToast("❌", "Código de escola não encontrado! Verifica se introduziste as letras e números corretamente.");
+                    playBeepSound('error');
+                }
+            } catch (err) {
+                console.error("Erro ao validar código da escola:", err);
+                showToast("⚠️", "Erro de ligação. Tenta novamente.");
+                playBeepSound('error');
+            }
+        }
+        window.validateSchoolCode = validateSchoolCode;
+
+        function proceedToStudentApp() {
+            database.player.schoolCode = activeSchoolCode;
+            document.getElementById('sec-school-gate').classList.add('hidden');
+            document.getElementById('sec-character').classList.remove('hidden');
+            
+            document.getElementById('character-school-badge').innerText = `Sincronizado: ${activeSchoolName}`;
+            document.getElementById('card-hero-nick').innerText = database.player.nick;
+            document.getElementById('card-hero-hp').innerText = `HP: ${playerHp}/100`;
+
+            playBeepSound('levelup');
+            showToast("🏫", `Sessão escolar estabelecida no ${activeSchoolName}!`);
+        }
+
+        // --- REGISTO DE INVESTIGADOR + ESCOLA (COM SUPORTE OFFLINE) ---
+        async function registerInvestigador(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('reg-name').value.trim();
+            const role = document.getElementById('reg-role').value.trim();
+            const institution = document.getElementById('reg-institution').value.trim();
+            const schoolCode = document.getElementById('reg-school-code').value.trim().toUpperCase();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            if (!isFirebaseActive) {
+                if (!window.offlineUsers) window.offlineUsers = {};
+                if (!window.offlineSchools) window.offlineSchools = {};
+
+                window.offlineUsers[email] = {
+                    password: password,
+                    name: name,
+                    role: role,
+                    institution: institution,
+                    schoolCode: schoolCode
+                };
+
+                window.offlineSchools[schoolCode] = {
+                    institutionName: institution,
+                    code: schoolCode
+                };
+
+                showToast("✨", "[Modo Demonstração] Escola e Investigador registados offline!");
+                playBeepSound('levelup');
+
+                toggleAuthSubTab('login');
+                document.getElementById('qg-email').value = email;
+                document.getElementById('qg-password').value = password;
+                return;
+            }
+
+            try {
+                const schoolRef = doc(db, 'usuarios', appId, 'public', 'data', 'schools', schoolCode);
+                const schoolSnap = await getDoc(schoolRef);
+                if (schoolSnap.exists()) {
+                    showToast("⚠️", "Este código escolar já está a ser utilizado por outro colégio!");
+                    playBeepSound('error');
+                    return;
+                }
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(schoolRef, {
+                    institutionName: institution,
+                    code: schoolCode,
+                    createdBy: user.uid,
+                    createdTimestamp: new Date().toISOString()
+                });
+
+                const investigatorRef = doc(db, 'usuarios', appId, 'public', 'data', 'investigators', user.uid);
+                await setDoc(investigatorRef, {
+                    uid: user.uid,
+                    name: name,
+                    role: role,
+                    institution: institution,
+                    schoolCode: schoolCode,
+                    email: email
+                });
+
+                showToast("✨", "Instituição e Investigador registados na nuvem!");
+                playBeepSound('levelup');
+                toggleAuthSubTab('login');
+            } catch (error) {
+                console.error("Erro ao criar conta:", error);
+                showToast("❌", "Erro ao criar registo: " + error.message);
+                playBeepSound('error');
+            }
+        }
+        window.registerInvestigador = registerInvestigador;
+
+        // --- LOGIN & LOGOUT DO INVESTIGADOR (COM SUPORTE OFFLINE) ---
+        async function loginInvestigador(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('qg-email').value.trim();
+            const password = document.getElementById('qg-password').value;
+
+            if (!isFirebaseActive) {
+                if (window.offlineUsers && window.offlineUsers[email] && window.offlineUsers[email].password === password) {
+                    const data = window.offlineUsers[email];
+                    activeSchoolCode = data.schoolCode;
+                    activeSchoolName = data.institution;
+                    isInvestigador = true;
+                    
+                    document.getElementById('qg-current-school-text').innerText = `${data.institution} (Código: ${data.schoolCode}) • Sincronizado por: ${data.name} (${data.role}) [TESTE]`;
+                    toggleQGView(true);
+                    showToast("🔑", "[Offline] Sessão iniciada com sucesso!");
+                    playBeepSound('levelup');
+                } else if (email === "professor@escola.com" && password === "123456") {
+                    activeSchoolCode = "2567@25";
+                    activeSchoolName = "Colégio 25";
+                    isInvestigador = true;
+                    
+                    document.getElementById('qg-current-school-text').innerText = `Colégio 25 (Código: 2567@25) • Sincronizado por: Prof. Administrador [DEMO]`;
+                    toggleQGView(true);
+                    showToast("🔑", "[Demo] Sessão iniciada com sucesso!");
+                    playBeepSound('levelup');
+                } else {
+                    showToast("❌", "Credenciais incorretas ou conta não criada!");
+                    playBeepSound('error');
+                }
+                return;
+            }
+
+            try {
+                // Ao fazer login, primeiro desliga qualquer conta temporária/anónima de forma segura
+                if (auth.currentUser && auth.currentUser.isAnonymous) {
+                    currentUser = null;
+                }
+                await signInWithEmailAndPassword(auth, email, password);
+                isInvestigador = true;
+                document.getElementById('form-qg-login').reset();
+            } catch (error) {
+                console.error("Erro ao autenticar:", error);
+                showToast("❌", "Credenciais incorretas ou não registadas!");
+                playBeepSound('error');
+            }
+        }
+        window.loginInvestigador = loginInvestigador;
+
+        async function logoutInvestigador() {
+            if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
+            if (unsubscribeCanvas) { unsubscribeCanvas(); unsubscribeCanvas = null; }
+
+            isInvestigador = false;
+            toggleQGView(false);
+            showToast("🔒", "Sessão terminada. O QG está protegido.");
+            playBeepSound('error');
+
+            if (isFirebaseActive) {
+                try {
+                    currentUser = null;
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Erro ao fechar sessão no Firebase:", error);
+                }
+            }
+        }
+        window.logoutInvestigador = logoutInvestigador;
+
+        function toggleQGView(showPainel) {
+            const loginCard = document.getElementById('qg-auth-box');
+            const contentWrapper = document.getElementById('qg-content-wrapper');
+
+            if (!loginCard || !contentWrapper) return;
+
+            if (showPainel) {
+                loginCard.classList.add('hidden');
+                contentWrapper.classList.remove('hidden');
+                updateDashboard();
+                renderCanvas();
+            } else {
+                loginCard.classList.remove('hidden');
+                contentWrapper.classList.add('hidden');
+            }
+        }
+
+        function toggleAuthSubTab(subTab) {
+            const loginSection = document.getElementById('auth-sub-login');
+            const registerSection = document.getElementById('auth-sub-register');
+            const btnLogin = document.getElementById('btn-sub-login');
+            const btnRegister = document.getElementById('btn-sub-register');
+
+            if (subTab === 'login') {
+                loginSection.classList.remove('hidden');
+                registerSection.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all bg-indigo-600 text-white";
+                btnRegister.className = "flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all text-slate-400 hover:text-white";
+            } else {
+                loginSection.classList.add('hidden');
+                registerSection.classList.remove('hidden');
+                btnLogin.className = "flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all text-slate-400 hover:text-white";
+                btnRegister.className = "flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all bg-indigo-600 text-white";
+            }
+            playBeepSound('success');
+        }
+        window.toggleAuthSubTab = toggleAuthSubTab;
+
+        // --- SISTEMAS DE NAVEGAÇÃO DE ABAS ---
+        window.switchTab = (tab) => {
+            document.getElementById('sec-character').classList.add('hidden');
+            document.getElementById('sec-game').classList.add('hidden');
+            document.getElementById('sec-dashboard').classList.add('hidden');
+
+            if (tab === 'character') {
+                if (!activeSchoolCode) {
+                    document.getElementById('sec-school-gate').classList.remove('hidden');
+                } else {
+                    document.getElementById('sec-character').classList.remove('hidden');
+                }
+            } else if (tab === 'game') {
+                document.getElementById('sec-game').classList.remove('hidden');
+                loadCombatStage();
+            } else if (tab === 'dashboard') {
+                document.getElementById('sec-dashboard').classList.remove('hidden');
+            }
+            playBeepSound('success');
+        };
+
+        // --- AUXILIARES LOCAIS ---
+        let soundEnabled = true;
+        window.toggleSound = () => {
+            soundEnabled = !soundEnabled;
+            showToast(soundEnabled ? '🔊' : '🔇', soundEnabled ? 'Efeitos Sonoros Ligados' : 'Sons Desativados');
+        };
+        window.playBeepSound = (type) => {
+            if (!soundEnabled) return;
+            console.log("Som ativo:", type);
+        };
+        window.showToast = (emoji, msg) => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-icon').innerText = emoji;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        };
+
+        // --- TABELA DE TÁTICAS ROTATIVAS DO RPG ---
+        const poolTactics = {
+            dialogo: [
+                { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Escolha equilibrada! Propor o diálogo amigável quebra o ódio.", success: true },
+                { name: "Ouvir os dois lados", dBoss: 45, dPlayer: 0, msg: "Excelente escuta ativa! Entender as razões reduz as barreiras do espectro.", success: true },
+                { name: "Enviar Mensagem Construtiva", dBoss: 30, dPlayer: 0, msg: "Play positivo! Palavras de força e apoio anulam as ofensas.", success: true },
+                { name: "Gritar de volta", dBoss: 0, dPlayer: 25, msg: "Gritar e usar agressividade apenas alimenta a discórdia! Perdeste HP.", success: false },
+                { name: "Ignorar e Fugir", dBoss: 0, dPlayer: 20, msg: "Afastares-te sem agir de todo dá espaço para o conflito crescer. Perdeste HP.", success: false }
+            ],
+            expressao: [
+                { name: "Desabafar discretamente", dBoss: 45, dPlayer: 0, msg: "Decisão corajosa! Conversar com um adulto responsável dita a luz na situação.", success: true },
+                { name: "Convidar para o lanche", dBoss: 40, dPlayer: 0, msg: "Acolhimento perfeito! Trazer o colega excluído para o grupo quebra o silêncio.", success: true },
+                { name: "Denúncia Segura", dBoss: 35, dPlayer: 0, msg: "Uso exemplar da cidadania escolar! Comunicar de forma segura protege a turma.", success: true },
+                { name: "Apoiar a exclusão", dBoss: 0, dPlayer: 35, msg: "Mancada! Juntar-se ao silêncio cúmplice magoa a turma inteira. Sofreste danos graves.", success: false },
+                { name: "Guardar o segredo", dBoss: 0, dPlayer: 15, msg: "Esconder a verdade por medo acumula tensionamento e enfraquece a tua Vibe.", success: false }
+            ],
+            comunicacao: [
+                { name: "Aplicar Comunicação Não-Violenta", dBoss: 50, dPlayer: 0, msg: "Golpe de Mestre! Expressar sentimentos sem acusar desarma qualquer espectro.", success: true },
+                { name: "Reunir Mediação de Pares", dBoss: 40, dPlayer: 0, msg: "Liderança pura! Chamar os colegas mediadores resolveu o atrito.", success: true },
+                { name: "Praticar Círculo de Empatia", dBoss: 45, dPlayer: 0, msg: "Incrível! Fazer a turma partilhar vivências derrete o rancor do Titã.", success: true },
+                { name: "Planear uma Vingança", dBoss: 0, dPlayer: 40, msg: "Combate falhado! Tentar dar o troco cria um círculo infinito de raiva. Danos massivos sofridos!", success: false },
+                { name: "Espalhar fofoca reativa", dBoss: 0, dPlayer: 30, msg: "Falha de tática! Revidar com boatos destrói o clima escolar e fere a tua Vibe.", success: false }
+            ],
+            preservacao: [
+                { name: "Organizar Mutirão de Limpeza", dBoss: 50, dPlayer: 0, msg: "Trabalho de equipa espetacular! Reparar o que foi estragado desintegra a energia da Gárgula.", success: true },
+                { name: "Denúncia Segura e Rápida", dBoss: 40, dPlayer: 0, msg: "Cidadania ativa! Alertar a escola de forma responsável impede que mais coisas sejam destruídas.", success: true },
+                { name: "Oficina de Grafite Autorizado", dBoss: 45, dPlayer: 0, msg: "Criatividade fantástica! Canalizar a energia para arte urbana autorizada reconstrói a harmonia.", success: true },
+                { name: "Apoiar a destruição das mesas", dBoss: 0, dPlayer: 35, msg: "Ficaste do lado do vandalismo! A escola degradada afeta o teu bem-estar emocional. Danos sofridos!", success: false },
+                { name: "Ignorar pichagens nas paredes", dBoss: 0, dPlayer: 20, msg: "Ao ignorares, a escola fica cada vez mais suja e descuidada. Perdeste HP.", success: false }
+            ]
+        };
+
+        const bosses = [
+            {
+                name: "Espectro do Silêncio",
+                emoji: "🤫",
+                weakness: "Expressão",
+                weaknessClass: "Empático(a) Ativo(a)",
+                hp: 80,
+                maxHp: 80,
+                desc: "Este monstro assombra quem vê injustiças mas tem medo de falar, fazendo o bullying crescer em segredo.",
+                weaknessPool: "expressao",
+                altPool: "dialogo"
+            },
+            {
+                name: "Troll de Teclado",
+                emoji: "👹",
+                weakness: "Diálogo",
+                weaknessClass: "Defensor(a) Digital",
+                hp: 100,
+                maxHp: 100,
+                desc: "Este espectro espalha boatos e ofensas digitais anónimas no chat da turma para humilhar os colegas.",
+                weaknessPool: "dialogo",
+                altPool: "expressao"
+            },
+            {
+                name: "Gárgula da Depredação",
+                emoji: "🔨",
+                weakness: "Preservação",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 120,
+                maxHp: 120,
+                desc: "Este monstro alimenta-se da destruição física da escola, quebrando mesas, pichando paredes e estragando o património de todos.",
+                weaknessPool: "preservacao",
+                altPool: "dialogo"
+            },
+            {
+                name: "Titã da Discórdia (CHEFÃO FINAL)",
+                emoji: "🐉",
+                weakness: "Comunicação",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 150,
+                maxHp: 150,
+                desc: "O maior perigo! Ele manipula discussões, promove vandalismo, espalha mentiras cruéis e tenta arruinar a escola.",
+                weaknessPool: "comunicacao",
+                altPool: "dialogo"
+            }
+        ];
+
+        // --- SINCRONIZAÇÃO EM TEMPO REAL ---
+        function setupRealtimeSync() {
+            if (unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
+            if (unsubscribeCanvas) { unsubscribeCanvas(); unsubscribeCanvas = null; }
+
+            if (!isFirebaseActive || !currentUser) return;
+            if (!isInvestigador) return;
+
+            const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
+            unsubscribeReports = onSnapshot(reportsCol, (snapshot) => {
+                const cloudReports = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.schoolCode === activeSchoolCode) {
+                        cloudReports.push(data);
+                    }
+                });
+                if (cloudReports.length > 0) {
+                    database.radarReports = cloudReports;
+                    if (isInvestigador) updateDashboard();
+                }
+            }, (err) => {
+                console.error("Erro na escuta dos relatos:", err);
+            });
+
+            if (!activeSchoolCode) return;
+
+            const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
+            unsubscribeCanvas = onSnapshot(canvasDoc, (docSnap) => {
+                if (docSnap.exists()) {
+                    database.canvas = docSnap.data();
+                    if (isInvestigador) renderCanvas();
+                }
+            }, (err) => {
+                console.error("Erro na escuta do canvas:", err);
+            });
+        }
+
+        // --- SUBMETER RELATÓRIO DO RADAR PARA A NUVEM ---
+        async function pushReportToCloud(report) {
+            if (!isFirebaseActive || !currentUser) return;
+            try {
+                const reportsCol = collection(db, 'usuarios', appId, 'public', 'data', 'radarReports');
+                await addDoc(reportsCol, report);
+            } catch (err) {
+                console.error("Falha ao sincronizar com a nuvem:", err);
+            }
+        }
+
+        // --- SYNC COMPLETO DO CANVAS DE PLANEAMENTO ---
+        async function syncCanvasToCloud() {
+            if (!isFirebaseActive || !currentUser || !activeSchoolCode) return;
+            try {
+                const canvasDoc = doc(db, 'usuarios', appId, 'public', 'data', 'canvas', activeSchoolCode);
+                await setDoc(canvasDoc, database.canvas);
+            } catch (err) {
+                console.error("Erro ao atualizar o canvas online:", err);
+            }
+        }
+
+        // --- BASE DE DADOS LOCAL (In-Memory Fallback) ---
+        let database = {
+            player: {
+                nick: "Cyber Fox",
+                avatar: "🦊",
+                class: "Defensor(a) Digital",
+                level: 1,
+                xp: 25,
+                hp: 100,
+                citizenshipPoints: 0,
+                created: false,
+                schoolCode: ""
+            },
+            badges: ["🌱 Iniciante"],
+            radarReports: [
+                { space: "Sala de Aula", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
+                { space: "Pátio / Recreio", vibe: "neutro", incidents: ["Bullying ou Ofensas"], schoolCode: "2567@25" },
+                { space: "Casas de Banho", vibe: "preocupado", incidents: ["Vandalismo"], schoolCode: "2567@25" },
+                { space: "Quadra de Desportos", vibe: "feliz", incidents: [], schoolCode: "2567@25" },
+                { space: "Entrada / Saída", vibe: "preocupado", incidents: ["Agressão Verbal"], schoolCode: "2567@25" }
+            ],
+            canvas: {
+                causas: ["📱 Pressão Digital e Perfis Anónimos", "💬 Falta de Diálogo e Escuta Ativa"],
+                solucoes: ["🕊️ Círculos de Construção de Paz", "🧠 Oficinas de Comunicação Não-Violenta"],
+                planos: ["📢 Patrulhas Amigáveis no Recreio", "📬 Caixa Física de Sugestões"]
+            }
+        };
+
+        // --- SISTEMAS DE CUSTOMIZAÇÃO DO HERÓI ---
+        const avataresDisponiveis = [
+            { emoji: "🦊", nome: "Fox" },
+            { emoji: "🐼", nome: "Panda" },
+            { emoji: "🐨", nome: "Koala" },
+            { emoji: "🦁", nome: "Lion" },
+            { emoji: "👾", nome: "Ghost" },
+            { emoji: "🦄", nome: "Unicorn" },
+            { emoji: "🦉", nome: "Owl" },
+            { emoji: "🐯", nome: "Tiger" }
+        ];
+
+        const classesDisponiveis = [
+            { nome: "Defensor(a) Digital", desc: "Especialista em detetar e neutralizar cyberbullying e ofensas virtuais no chat da escola.", icon: "💻", bonus: "Bónus contra Trolls" },
+            { nome: "Mediador(a) da Paz", desc: "Treinado(a) para ouvir os dois lados e resolver brigas físicas ou verbais de forma justa.", icon: "⚖️", bonus: "Bónus contra Titãs" },
+            { nome: "Empático(a) Ativo(a)", desc: "Mestre em acolher alunos solitários e curar o clima das salas de aula com afeto.", icon: "🧠", bonus: "Bónus contra Silêncio" }
+        ];
+
+        let selectedAvatarIdx = 0;
+        let selectedClassIdx = 0;
+
+        function renderCharacterCreator() {
+            const avsCont = document.getElementById('avatars-container');
+            if (!avsCont) return;
+            avsCont.innerHTML = '';
+            avataresDisponiveis.forEach((av, i) => {
+                const btn = document.createElement('button');
+                btn.className = `p-3 rounded-2xl bg-slate-950 border text-center transition-all flex flex-col items-center justify-center gap-1 hover:border-indigo-500 ${selectedAvatarIdx === i ? 'border-indigo-500 bg-indigo-500/10 scale-105' : 'border-slate-800'}`;
+                btn.onclick = () => { selectedAvatarIdx = i; renderCharacterCreator(); playBeepSound('success'); };
+                btn.innerHTML = `
+                    <span class="text-2xl">${av.emoji}</span>
+                    <span class="text-[9px] font-bold text-slate-400">${av.nome}</span>
+                `;
+                avsCont.appendChild(btn);
+            });
+
+            const clsCont = document.getElementById('classes-container');
+            if (!clsCont) return;
+            clsCont.innerHTML = '';
+            classesDisponiveis.forEach((cls, i) => {
+                const active = selectedClassIdx === i;
+                const card = document.createElement('button');
+                card.className = `p-4 text-left rounded-2xl border bg-slate-950 transition-all space-y-2 flex flex-col justify-between hover:border-indigo-500 ${active ? 'border-indigo-500 bg-indigo-500/10 scale-102' : 'border-slate-800'}`;
+                card.onclick = () => { selectedClassIdx = i; renderCharacterCreator(); playBeepSound('success'); };
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">${cls.icon}</span>
+                            <h4 class="font-bold text-sm text-white">${cls.nome}</h4>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">${cls.desc}</p>
+                    </div>
+                    <span class="inline-block text-[9px] font-black uppercase text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">${cls.bonus}</span>
+                `;
+                clsCont.appendChild(card);
+            });
+        }
+
+        function updateCharacterTabUI() {
+            const card = document.getElementById('active-character-card');
+            const form = document.getElementById('character-creator-form');
+            if (!card || !form) return;
+
+            if (database.player.created) {
+                card.classList.remove('hidden');
+                form.classList.add('hidden');
+                
+                document.getElementById('card-hero-avatar').innerText = database.player.avatar;
+                document.getElementById('card-hero-nick').innerText = database.player.nick;
+                document.getElementById('card-hero-class').innerText = database.player.class;
+                document.getElementById('card-hero-lvl').innerText = `Lvl ${database.player.level}`;
+                document.getElementById('card-hero-hp').innerText = `HP: ${playerHp}/100`;
+            } else {
+                card.classList.add('hidden');
+                form.classList.remove('hidden');
+            }
+        }
+
+        function showEditCharacterForm() {
+            database.player.created = false;
+            updateCharacterTabUI();
+            playBeepSound('success');
+        }
+        window.showEditCharacterForm = showEditCharacterForm;
+
+        function confirmCharacter() {
+            const nickInput = document.getElementById('input-nick').value.trim();
+            if (!nickInput) {
+                showToast("⚠️", "Digita uma alcunha/nickname antes de avançar!");
+                playBeepSound('error');
+                return;
+            }
+
+            database.player.nick = nickInput;
+            database.player.avatar = avataresDisponiveis[selectedAvatarIdx].emoji;
+            database.player.class = classesDisponiveis[selectedClassIdx].nome;
+            database.player.created = true;
+
+            document.getElementById('combat-profile-avatar').innerText = database.player.avatar;
+            document.getElementById('combat-profile-nick').innerText = database.player.nick;
+            document.getElementById('combat-profile-class').innerText = database.player.class;
+
+            document.getElementById('battle-hero-name').innerText = `Tu (${database.player.nick})`;
+
+            playBeepSound('levelup');
+            showToast("🎖️", "Herói desbloqueado com sucesso! Prepara-te para a campanha.");
+            updateCharacterTabUI();
+            switchTab('game');
+        }
+        window.confirmCharacter = confirmCharacter;
+
+        // --- SISTEMA DE COMBATE REAL DO RPG ---
+        let currentStageIdx = 0;
+        let playerHp = 100;
+        let currentBossHp = 0;
+        let currentTactics = [];
+
+        function generateTurnTactics(boss) {
+            const weaknessPool = poolTactics[boss.weaknessPool] || [];
+            const altPool = poolTactics[boss.altPool] || [];
+            const selected = [
+                ...weaknessPool.slice(0, 2),
+                ...altPool.slice(0, 2)
+            ];
+            return selected.sort(() => Math.random() - 0.5);
+        }
+
+        function loadCombatStage() {
+            if (!activeSchoolCode) {
+                document.getElementById('battleground-container').classList.add('hidden');
+                document.getElementById('battle-victory-screen').classList.add('hidden');
+                document.getElementById('battle-defeat-screen').classList.add('hidden');
+                const list = document.getElementById('battle-actions-container');
+                if (list) {
+                    list.innerHTML = `
+                        <div class="col-span-2 text-center py-8 space-y-4">
+                            <p class="text-slate-400 font-bold">Introduz primeiro o Código Escolar para poderes aceder à campanha!</p>
+                            <button onclick="switchTab('character')" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all">⛺ Sincronizar Código</button>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            if (!database.player.created) {
+                document.getElementById('battleground-container').classList.add('hidden');
+                document.getElementById('battle-victory-screen').classList.add('hidden');
+                document.getElementById('battle-defeat-screen').classList.add('hidden');
+                const list = document.getElementById('battle-actions-container');
+                if (list) {
+                    list.innerHTML = `
+                        <div class="col-span-2 text-center py-8 space-y-4">
+                            <p class="text-slate-400 font-bold">Cria o teu Herói primeiro para poderes entrar na Campanha!</p>
+                            <button onclick="switchTab('character')" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all">⛺ Criar Herói agora</button>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            if (currentStageIdx >= bosses.length) {
+                document.getElementById('battleground-container').classList.add('hidden');
+                document.getElementById('battle-victory-screen').classList.remove('hidden');
+                document.getElementById('battle-defeat-screen').classList.add('hidden');
+                document.getElementById('victory-title').innerText = "🏆 Defensor Lenda da Escola!";
+                document.getElementById('victory-desc').innerText = "Venceste a campanha! Purificaste o Titã da Discórdia e trouxeste o diálogo saudável para a escola.";
+                unlockBadge("🌟 Guardião(ã) Escolar");
+                return;
+            }
+
+            const boss = bosses[currentStageIdx];
+            if (currentBossHp === 0) currentBossHp = boss.hp;
+
+            document.getElementById('battleground-container').classList.remove('hidden');
+            document.getElementById('battle-victory-screen').classList.add('hidden');
+            document.getElementById('battle-defeat-screen').classList.add('hidden');
+
+            document.getElementById('battle-boss-name').innerText = boss.name;
+            document.getElementById('battle-boss-hp-text').innerText = `${currentBossHp}/${boss.maxHp} HP`;
+            document.getElementById('battle-boss-emoji').innerText = boss.emoji;
+            document.getElementById('battle-boss-weakness').innerText = `Fraqueza: ${boss.weakness}`;
+            document.getElementById('battle-boss-display-title').innerText = boss.name;
+            document.getElementById('battle-boss-desc').innerText = boss.desc;
+
+            document.getElementById('battle-hero-hp-text').innerText = `${playerHp}/100 HP`;
+            document.getElementById('profile-hp').innerText = `HP: ${playerHp}/100`;
+
+            document.getElementById('battle-boss-hp-bar').style.width = `${(currentBossHp / boss.maxHp) * 100}%`;
+            document.getElementById('battle-hero-hp-bar').style.width = `${playerHp}%`;
+
+            if (currentTactics.length === 0) {
+                currentTactics = generateTurnTactics(boss);
+            }
+
+            const actCont = document.getElementById('battle-actions-container');
+            if (actCont) {
+                actCont.innerHTML = '';
+                currentTactics.forEach((tac, idx) => {
+                    if (!tac) return;
+                    
+                    const btn = document.createElement('button');
+                    btn.className = "p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-indigo-500 text-left transition-all hover-scale-102 flex flex-col justify-between h-32";
+                    
+                    const isBonus = database.player.class === boss.weaknessClass && tac.success;
+                    const dBossValue = isBonus ? tac.dBoss + 20 : tac.dBoss;
+
+                    btn.onclick = () => triggerCombatTurn(tac, dBossValue, isBonus);
+                    btn.innerHTML = `
+                        <div class="space-y-1">
+                            <h5 class="font-extrabold text-xs text-white">${tac.name}</h5>
+                            <p class="text-[10px] text-slate-500 leading-tight">Escolha de convivência ativa.</p>
+                        </div>
+                        <div class="flex justify-between items-center w-full">
+                            <span class="text-[9px] font-black uppercase ${tac.success ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'} px-2 py-0.5 rounded">
+                                ${tac.success ? `Ataque: ${dBossValue} ${isBonus ? '🔥' : ''}` : `Aviso`}
+                            </span>
+                            <span class="text-xs">⚔️</span>
+                        </div>
+                    `;
+                    actCont.appendChild(btn);
+                });
+            }
+        }
+        window.loadCombatStage = loadCombatStage;
+
+        function triggerCombatTurn(tactic, calculatedDmg, isBonus) {
+            const boss = bosses[currentStageIdx];
+            const logCont = document.getElementById('battle-log');
+
+            const combatCard = document.getElementById('combat-card-element');
+            if (combatCard) {
+                combatCard.classList.add('animate-shake');
+                setTimeout(() => combatCard.classList.remove('animate-shake'), 400);
+            }
+
+            let logEntry = "";
+
+            if (tactic.success) {
+                currentBossHp -= calculatedDmg;
+                if (currentBossHp < 0) currentBossHp = 0;
+                playBeepSound('boss_hit');
+                logEntry = `<div class="text-emerald-400 font-bold">[COMBATE] ${database.player.nick} usou "${tactic.name}"! ${tactic.msg} causou ${calculatedDmg} de dano ao ${boss.name}!</div>`;
+            } else {
+                playerHp -= tactic.dPlayer;
+                if (playerHp < 0) playerHp = 0;
+                playBeepSound('error');
+                logEntry = `<div class="text-rose-400 font-bold">[ALERTA] O ${boss.name} contra-atacou! ${tactic.msg} perdeste ${tactic.dPlayer} HP!</div>`;
+            }
+
+            if (logCont) {
+                logCont.innerHTML += logEntry;
+                logCont.scrollTop = logCont.scrollHeight;
+            }
+
+            currentTactics = [];
+
+            if (playerHp <= 0) {
+                playBeepSound('error');
+                if (logCont) {
+                    logCont.innerHTML += `<div class="text-red-500 font-black">[FIM DE JOGO] A tua Vibe Emocional esgotou-se. Foste derrotado!</div>`;
+                    logCont.scrollTop = logCont.scrollHeight;
+                }
+                document.getElementById('battleground-container').classList.add('hidden');
+                document.getElementById('battle-defeat-screen').classList.remove('hidden');
+                return;
+            }
+
+            if (currentBossHp <= 0) {
+                playBeepSound('levelup');
+                database.player.citizenshipPoints += 50;
+                addXP(120);
+
+                if (boss.name === "Espectro do Silêncio") unlockBadge("🗣️ Rompe-Silêncio");
+                if (boss.name === "Troll de Teclado") unlockBadge("💻 Guardião Digital");
+                if (boss.name === "Gárgula da Depredação") unlockBadge("🔨 Protetor do Património");
+                if (boss.name.includes("Titã")) unlockBadge("🕊️ Mediador Lendário");
+
+                document.getElementById('battleground-container').classList.add('hidden');
+                document.getElementById('battle-victory-screen').classList.remove('hidden');
+                document.getElementById('victory-title').innerText = `${boss.name} Purificado!`;
+                document.getElementById('victory-desc').innerText = `A tua escolha justa e racional enfraqueceu o espectro e estabeleceu um excelente clima de respeito.`;
+                document.getElementById('battle-xp-reward').innerText = `+120 XP`;
+                return;
+            }
+
+            loadCombatStage();
+        }
+        window.triggerCombatTurn = triggerCombatTurn;
+
+        // --- SISTEMA DE PROVÉM DE CRITÉRIOS DE PROGRESSÃO ---
+        window.nextLevel = () => {
+            currentStageIdx++;
+            currentBossHp = 0;
+            document.getElementById('battle-victory-screen').classList.add('hidden');
+            loadCombatStage();
+        };
+
+        window.retryCombat = () => {
+            playerHp = 100;
+            currentBossHp = 0;
+            currentTactics = [];
+            document.getElementById('battle-defeat-screen').classList.add('hidden');
+            loadCombatStage();
+        };
+
+        window.addXP = (amount) => {
+            database.player.xp += amount;
+            if (database.player.xp >= 100) {
+                database.player.level++;
+                database.player.xp -= 100;
+                showToast("⭐", `Subiste para o Nível ${database.player.level}!`);
+                playBeepSound('levelup');
+            }
+        };
+
+        window.unlockBadge = (badgeName) => {
+            if (!database.badges.includes(badgeName)) {
+                database.badges.push(badgeName);
+                showToast("🏅", `Novo Emblema: ${badgeName}`);
+            }
+        };
+
+        // --- ATUALIZADORES DE LAYOUT DO INVESTIGADOR (DASHBOARD) ---
+        function updateDashboard() {
+            const radCont = document.getElementById('dashboard-radar-placeholder');
+            if (radCont) {
+                radCont.innerHTML = '';
+                database.radarReports.forEach(rep => {
+                    const el = document.createElement('div');
+                    el.className = "flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-left text-[11px]";
+                    const isOk = rep.incidents.length === 0;
+                    el.innerHTML = `
+                        <div>
+                            <span class="font-bold text-white">${rep.space}</span>
+                            <span class="block text-[9px] text-slate-500">${isOk ? 'Clima Calmo' : 'Alerta: ' + rep.incidents.join(', ')}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isOk ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">
+                            ${rep.vibe.toUpperCase()}
+                        </span>
+                    `;
+                    radCont.appendChild(el);
+                });
+            }
+        }
+
+        function renderCanvas() {
+            const wrapper = document.getElementById('canvas-wrapper-ui');
+            if (wrapper) {
+                wrapper.innerHTML = `
+                    <div>
+                        <span class="font-bold text-white block mb-1">Causas Identificadas:</span>
+                        <ul class="list-disc list-inside text-slate-400 space-y-1">
+                            ${database.canvas.causas.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="font-bold text-white block mb-1">Soluções Ativas:</span>
+                        <ul class="list-disc list-inside text-slate-400 space-y-1">
+                            ${database.canvas.solucoes.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="font-bold text-white block mb-1">Plano de Ação Escolar:</span>
+                        <ul class="list-disc list-inside text-slate-400 space-y-1">
+                            ${database.canvas.planos.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Executa inicialização visual
+        renderCharacterCreator();
+        updateCharacterTabUI();
+    </script>
+</body>
+</html>
