@@ -661,8 +661,10 @@
             database.player.schoolCode = activeSchoolCode;
             
             document.getElementById('sec-school-gate').style.display = 'none';
-            
-            document.getElementById('sec-character').classList.remove('hidden');
+
+            const targetTab = pendingTab || 'character';
+            pendingTab = null;
+
             document.getElementById('character-school-badge').innerText = `Sincronizado: ${activeSchoolName}`;
             document.getElementById('card-hero-nick').innerText = database.player.nick;
             document.getElementById('card-hero-hp').innerText = `HP: ${playerHp}/100`;
@@ -671,6 +673,8 @@
             playBeepSound('levelup');
             showToast("🏫", `Sessão estabelecida em ${activeSchoolName}!`);
             setupRealtimeSync();
+
+            switchTab(targetTab);
         }
 
         // --- GERAÇÃO DE CÓDIGO ESCOLAR ÚNICO ---
@@ -983,6 +987,8 @@
         window.toggleAuthSubTab = toggleAuthSubTab;
 
         // --- SISTEMAS DE NAVEGAÇÃO DE ABAS ---
+        let pendingTab = null;
+
         window.switchTab = (tab) => {
             document.getElementById('sec-character').classList.add('hidden');
             document.getElementById('sec-game').classList.add('hidden');
@@ -992,6 +998,7 @@
 
             if (tab === 'character') {
                 if (!activeSchoolCode) {
+                    pendingTab = 'character';
                     document.getElementById('sec-school-gate').style.display = 'block';
                 } else {
                     document.getElementById('sec-character').classList.remove('hidden');
@@ -1000,9 +1007,21 @@
                 document.getElementById('sec-game').classList.remove('hidden');
                 loadCombatStage();
             } else if (tab === 'radar') {
-                document.getElementById('sec-radar').classList.remove('hidden');
+                if (!activeSchoolCode) {
+                    pendingTab = 'radar';
+                    document.getElementById('sec-school-gate').style.display = 'block';
+                    showToast("🏫", "Entra com o código da tua escola primeiro!");
+                } else {
+                    document.getElementById('sec-radar').classList.remove('hidden');
+                }
             } else if (tab === 'vent') {
-                document.getElementById('sec-vent').classList.remove('hidden');
+                if (!activeSchoolCode) {
+                    pendingTab = 'vent';
+                    document.getElementById('sec-school-gate').style.display = 'block';
+                    showToast("🏫", "Entra com o código da tua escola primeiro!");
+                } else {
+                    document.getElementById('sec-vent').classList.remove('hidden');
+                }
             } else if (tab === 'dashboard') {
                 document.getElementById('sec-dashboard').classList.remove('hidden');
                 if (isInvestigador) {
