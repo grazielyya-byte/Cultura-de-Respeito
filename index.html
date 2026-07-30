@@ -131,8 +131,11 @@
                     <button onclick="switchTab('game')" class="flex items-center gap-3 px-4 py-3 bg-slate-950/60 hover:bg-slate-800 rounded-xl text-xs font-bold text-left text-slate-300 w-full whitespace-nowrap transition-all">
                         <span>⚔️</span> <span class="hidden md:inline">Campanha Combate</span>
                     </button>
-                    <button id="tab-btn-radar" onclick="switchTab('radar')" class="flex items-center gap-3 px-4 py-3 bg-slate-950/20 hover:bg-slate-800 rounded-xl text-xs font-bold text-left text-slate-500 w-full whitespace-nowrap opacity-60 transition-all">
-                        <span>📡</span> <span class="hidden md:inline">Radar de Clima 🔒</span>
+                    <button id="tab-btn-radar" onclick="switchTab('radar')" class="flex items-center gap-3 px-4 py-3 bg-slate-950/60 hover:bg-slate-800 rounded-xl text-xs font-bold text-left text-slate-300 w-full whitespace-nowrap transition-all">
+                        <span>📡</span> <span class="hidden md:inline">Radar de Clima</span>
+                    </button>
+                    <button onclick="switchTab('vent')" class="flex items-center gap-3 px-4 py-3 bg-slate-950/60 hover:bg-slate-800 rounded-xl text-xs font-bold text-left text-slate-300 w-full whitespace-nowrap transition-all">
+                        <span>💬</span> <span class="hidden md:inline">Desabafo Anônimo</span>
                     </button>
                     <button onclick="switchTab('dashboard')" class="flex items-center gap-3 px-4 py-3 bg-slate-950/60 hover:bg-slate-800 rounded-xl text-xs font-bold text-left text-slate-300 w-full whitespace-nowrap transition-all">
                         <span>💻</span> <span class="hidden md:inline">QG Investigador</span>
@@ -255,6 +258,24 @@
 
                         <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all">Enviar Resposta Anônima 📡</button>
                     </form>
+                </section>
+
+                <section id="sec-vent" class="hidden max-w-2xl mx-auto bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-6">
+                    <div class="text-center space-y-2">
+                        <span class="text-xs font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full uppercase tracking-widest">Espaço Livre</span>
+                        <h2 class="text-2xl font-black text-white">Desabafo Anônimo</h2>
+                        <p class="text-xs text-slate-400 leading-relaxed">Esse espaço é seu. Use sempre que precisar — não precisa ter acabado nenhuma batalha, nem esperar nada. Só escrever o que você está sentindo.</p>
+                        <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-300 font-bold">
+                            🔒 Ninguém vai saber quem escreveu. É tudo anônimo e secreto, sempre.
+                        </div>
+                    </div>
+
+                    <form id="form-vent" onsubmit="submitVentMessage(event)" class="space-y-4">
+                        <textarea id="vent-textarea" placeholder="Escreve aqui o que você está sentindo, sem medo..." required class="w-full h-40 p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 outline-none resize-none"></textarea>
+                        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all">Enviar Desabafo Anônimo 💬</button>
+                    </form>
+
+                    <p class="text-center text-[11px] text-slate-500">Se você está passando por algo sério ou perigoso, procure também um adulto de confiança, um professor ou peça ajuda direto na escola. Esse espaço ajuda a desabafar, mas não substitui ajuda de verdade quando é urgente.</p>
                 </section>
 
                 <section id="sec-dashboard" class="hidden space-y-8">
@@ -963,15 +984,10 @@
 
         // --- SISTEMAS DE NAVEGAÇÃO DE ABAS ---
         window.switchTab = (tab) => {
-            if (tab === 'radar' && !database.isGameFinished) {
-                showToast("🔒", "Tens de concluir primeiro a Campanha de Combate para desbloquear o Radar!");
-                playBeepSound('error');
-                return;
-            }
-
             document.getElementById('sec-character').classList.add('hidden');
             document.getElementById('sec-game').classList.add('hidden');
             document.getElementById('sec-radar').classList.add('hidden');
+            document.getElementById('sec-vent').classList.add('hidden');
             document.getElementById('sec-dashboard').classList.add('hidden');
 
             if (tab === 'character') {
@@ -985,6 +1001,8 @@
                 loadCombatStage();
             } else if (tab === 'radar') {
                 document.getElementById('sec-radar').classList.remove('hidden');
+            } else if (tab === 'vent') {
+                document.getElementById('sec-vent').classList.remove('hidden');
             } else if (tab === 'dashboard') {
                 document.getElementById('sec-dashboard').classList.remove('hidden');
                 if (isInvestigador) {
@@ -1204,6 +1222,44 @@
         window.skipReflectiveQuestion = () => {
             document.getElementById('modal-reflective-question').classList.add('hidden');
             finishEntireGameJourney();
+        };
+
+        // --- DESABAFO ANÓNIMO LIVRE (SEMPRE DISPONÍVEL, SEM DEPENDER DA BATALHA) ---
+        window.submitVentMessage = async (event) => {
+            event.preventDefault();
+
+            const textarea = document.getElementById('vent-textarea');
+            const textVal = textarea.value.trim();
+            if (!textVal) {
+                showToast("⚠️", "Escreve algo antes de enviar!");
+                playBeepSound('error');
+                return;
+            }
+
+            const refData = {
+                text: textVal,
+                schoolCode: activeSchoolCode || "OFFLINE_CAMP",
+                timestamp: new Date().toISOString(),
+                source: "desabafo-livre"
+            };
+
+            if (isFirebaseActive && currentUser) {
+                try {
+                    const colRef = collection(db, 'usuarios', appId, 'public', 'data', 'reflections');
+                    await addDoc(colRef, refData);
+                } catch (e) {
+                    console.error("Erro ao enviar desabafo:", e);
+                    showToast("❌", "Não foi possível enviar agora. Tenta de novo em instantes.");
+                    playBeepSound('error');
+                    return;
+                }
+            } else {
+                database.reflectiveResponses.push(refData);
+            }
+
+            textarea.value = "";
+            showToast("💬", "Desabafo enviado. Obrigado por confiar nesse espaço!");
+            playBeepSound('levelup');
         };
 
         function finishEntireGameJourney() {
