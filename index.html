@@ -53,13 +53,13 @@
                     Cultura de <span class="text-indigo-400">Respeito</span>
                 </h1>
                 <p class="text-slate-400 text-xs sm:text-sm mt-3 max-w-md mx-auto leading-relaxed">
-                    Combate os monstros da incompreensão e ajuda a construir um clima escolar pacífico e seguro!
+                    Combate os monstros que atrapalham a boa convivência e ajuda a deixar a escola mais legal e segura pra todo mundo!
                 </p>
 
                 <div class="mt-8 flex justify-center gap-6 text-slate-400 text-xs font-bold border-t border-slate-800/60 pt-6">
-                    <span class="flex items-center gap-2">🛡️ RPG Pedagógico</span>
-                    <span class="flex items-center gap-2">📡 Radar Anónimo</span>
-                    <span class="flex items-center gap-2">📊 QG em Tempo Real</span>
+                    <span class="flex items-center gap-2">🛡️ Jogo Educativo</span>
+                    <span class="flex items-center gap-2">📡 Enquete Anônima</span>
+                    <span class="flex items-center gap-2">📊 Painel ao Vivo</span>
                 </div>
             </div>
 
@@ -95,17 +95,18 @@
 
     <div id="modal-reflective-question" class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border border-slate-700 max-w-lg w-full p-8 rounded-3xl space-y-6 shadow-2xl">
-            <h3 class="text-xl font-black text-indigo-400">📝 Espaço de Escuta Ativa (Anónimo)</h3>
+            <h3 class="text-xl font-black text-indigo-400">📝 Espaço Para Desabafar (Anônimo)</h3>
+            <p id="reflective-intro-text" class="text-xs text-slate-300 leading-relaxed"></p>
             <p class="text-xs text-slate-300 leading-relaxed">
-                O Titã revelou que agia com raiva porque sofria em casa e sentia medo de não ser aceite. Já presenciaste ou passaste por uma situação parecida de exclusão, pressão ou bullying na escola? Se sim, como te sentiste em relação a isso?
+                Aqui é um espaço seguro pra você desabafar sobre como está se sentindo. Já passaste por uma situação parecida de exclusão, pressão ou bullying na escola? Escrever sobre isso pode te ajudar a se sentir melhor — e você não precisa ter vergonha ou medo, porque ninguém vai saber quem escreveu.
             </p>
             <div class="p-3 bg-indigo-950/30 border border-indigo-500/20 rounded-xl text-[11px] text-indigo-300 font-bold">
-                🔒 A tua resposta é 100% confidencial e anónima. Ajudará os investigadores a criarem soluções sem nunca te expor.
+                🔒 A tua resposta é 100% confidencial e anônima. Isso ajuda a escola a cuidar melhor de todo mundo, sem nunca te expor.
             </div>
-            <textarea id="textarea-reflective" placeholder="Partilha a tua vivência ou sentimentos aqui..." class="w-full h-32 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 outline-none resize-none"></textarea>
+            <textarea id="textarea-reflective" placeholder="Escreve aqui como você está se sentindo..." class="w-full h-32 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 outline-none resize-none"></textarea>
             <div class="flex gap-3">
-                <button onclick="skipReflectiveQuestion()" class="flex-1 py-3 bg-slate-800 text-slate-400 font-bold rounded-xl text-xs">Prefiro não partilhar</button>
-                <button onclick="submitReflectiveQuestion()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs">Enviar Relato Anónimo ✨</button>
+                <button onclick="skipReflectiveQuestion()" class="flex-1 py-3 bg-slate-800 text-slate-400 font-bold rounded-xl text-xs">Prefiro não compartilhar</button>
+                <button onclick="submitReflectiveQuestion()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs">Enviar Desabafo Anônimo ✨</button>
             </div>
         </div>
     </div>
@@ -153,8 +154,8 @@
             <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-4xl mx-auto w-full">
                 
                 <section id="sec-school-gate" class="max-w-md mx-auto bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
-                    <h3 class="text-xl font-black text-white">Sincronizar Escola</h3>
-                    <p class="text-xs text-slate-400">Insere o código fornecido pelo teu colégio para te ligares ao QG local.</p>
+                    <h3 class="text-xl font-black text-white">Entrar na Escola</h3>
+                    <p class="text-xs text-slate-400">Digita o código que a tua escola te deu pra entrar no jogo.</p>
                     <input type="text" id="input-school-code" placeholder="CÓDIGO ESCOLAR (ex: 2567@25)" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white uppercase font-bold text-center focus:border-indigo-500 outline-none">
                     <button onclick="validateSchoolCode()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all">Entrar na Escola 🏫</button>
                 </section>
@@ -163,20 +164,20 @@
                     <div id="character-school-badge" class="text-center text-xs font-extrabold text-indigo-400"></div>
 
                     <div id="character-creator-form" class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-6">
-                        <h3 class="text-lg font-black text-white">Personalizar Ficha do Herói</h3>
+                        <h3 class="text-lg font-black text-white">Monta o Teu Herói</h3>
                         
                         <div class="space-y-2">
-                            <label class="text-xs text-slate-400 font-bold">Nickname do Aluno:</label>
+                            <label class="text-xs text-slate-400 font-bold">Como você quer ser chamado:</label>
                             <input type="text" id="input-nick" placeholder="Ex: Cyber_Fox" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-xs text-slate-400 font-bold">Escolhe o teu Avatar:</label>
+                            <label class="text-xs text-slate-400 font-bold">Escolhe o teu avatar:</label>
                             <div id="avatars-container" class="grid grid-cols-4 gap-3"></div>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-xs text-slate-400 font-bold">Escolhe a tua Classe Emocional:</label>
+                            <label class="text-xs text-slate-400 font-bold">Escolhe o teu jeito de ajudar:</label>
                             <div id="classes-container" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
                         </div>
 
@@ -201,38 +202,38 @@
 
                 <section id="sec-radar" class="hidden max-w-2xl mx-auto bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-6">
                     <div class="text-center space-y-2">
-                        <span class="text-xs font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full uppercase tracking-widest">Inquérito de Ambiente</span>
-                        <h2 class="text-2xl font-black text-white">Radar de Clima Escolar</h2>
-                        <p class="text-xs text-slate-400">Ajuda-nos a mapear e melhorar a convivência da nossa escola.</p>
+                        <span class="text-xs font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full uppercase tracking-widest">Pesquisa Rápida</span>
+                        <h2 class="text-2xl font-black text-white">Radar da Escola</h2>
+                        <p class="text-xs text-slate-400">Ajuda a gente a entender como está o clima na tua escola.</p>
                         <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-300 font-bold">
-                            🔒 Todas as respostas enviadas aqui são 100% Anónimas e Confidenciais! Ninguém saberá quem respondeu.
+                            🔒 Ninguém vai saber quem respondeu. É tudo anônimo e secreto!
                         </div>
                     </div>
 
                     <form id="form-radar-percepcao" onsubmit="submitRadarResponse(event)" class="space-y-6">
                         <div class="space-y-2">
-                            <label class="text-xs text-slate-400 font-bold block">1. Seleciona o ambiente da escola que queres avaliar:</label>
+                            <label class="text-xs text-slate-400 font-bold block">1. Escolhe o lugar da escola que você quer avaliar:</label>
                             <select id="radar-space" required class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                                <option value="" disabled selected>Escolhe um espaço...</option>
+                                <option value="" disabled selected>Escolhe um lugar...</option>
                                 <option value="Sala de Aula">Sala de Aula 🏫</option>
                                 <option value="Pátio / Recreio">Pátio / Recreio 🌳</option>
-                                <option value="Casas de Banho">Casas de Banho 🚻</option>
-                                <option value="Quadra de Desportos">Quadra de Desportos 🏀</option>
-                                <option value="Entrada / Saída">Entrada / Saída de Alunos 🚪</option>
+                                <option value="Casas de Banho">Banheiro 🚻</option>
+                                <option value="Quadra de Desportos">Quadra 🏀</option>
+                                <option value="Entrada / Saída">Entrada / Saída dos Alunos 🚪</option>
                             </select>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-xs text-slate-400 font-bold block">2. Como te sentes normalmente quando estás neste lugar?</label>
+                            <label class="text-xs text-slate-400 font-bold block">2. Como você se sente normalmente nesse lugar?</label>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 <label class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:border-indigo-500 transition-all">
                                     <input type="radio" name="radar-vibe" value="Bem" required class="accent-indigo-500"> Bem 😊
                                 </label>
                                 <label class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:border-indigo-500 transition-all">
-                                    <input type="radio" name="radar-vibe" value="Mau" class="accent-indigo-500"> Mau 🙁
+                                    <input type="radio" name="radar-vibe" value="Mau" class="accent-indigo-500"> Mal 🙁
                                 </label>
                                 <label class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:border-indigo-500 transition-all">
-                                    <input type="radio" name="radar-vibe" value="Indiferente" class="accent-indigo-500"> Neutro 😐
+                                    <input type="radio" name="radar-vibe" value="Indiferente" class="accent-indigo-500"> Mais ou menos 😐
                                 </label>
                                 <label class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:border-indigo-500 transition-all">
                                     <input type="radio" name="radar-vibe" value="Agitado" class="accent-indigo-500"> Agitado ⚡
@@ -241,18 +242,18 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-xs text-slate-400 font-bold block">3. Na tua perceção, qual é o tipo de atitude prejudicial que mais se vê neste local?</label>
+                            <label class="text-xs text-slate-400 font-bold block">3. Na tua opinião, qual é o problema que mais acontece nesse lugar?</label>
                             <select id="radar-delito" required class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                                <option value="" disabled selected>Seleciona o problema mais frequente...</option>
-                                <option value="Nenhum / Espaço Seguro">Tudo calmo (Espaço Seguro) ✨</option>
-                                <option value="Bullying ou Ofensas">Bullying ou Ofensas Diretas 🗣️</option>
-                                <option value="Vandalismo / Estragar Coisas">Vandalismo / Danificar Equipamentos 🔨</option>
-                                <option value="Exclusão Social / Solidão">Exclusão Social / Ignorar Colegas 🤫</option>
-                                <option value="Agressão Verbal / Discussões">Agressões Verbais / Gritos 👹</option>
+                                <option value="" disabled selected>Escolhe o problema mais comum...</option>
+                                <option value="Nenhum / Espaço Seguro">Tá tudo tranquilo por lá ✨</option>
+                                <option value="Bullying ou Ofensas">Bullying ou xingamentos 🗣️</option>
+                                <option value="Vandalismo / Estragar Coisas">Quebram ou sujam as coisas 🔨</option>
+                                <option value="Exclusão Social / Solidão">Excluem ou ignoram os colegas 🤫</option>
+                                <option value="Agressão Verbal / Discussões">Brigas e gritos 👹</option>
                             </select>
                         </div>
 
-                        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all">Enviar Avaliação Anónima 📡</button>
+                        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all">Enviar Resposta Anônima 📡</button>
                     </form>
                 </section>
 
@@ -281,7 +282,7 @@
                                 <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Gerar Código da Escola ✨</button>
                             </form>
                             <div id="school-code-result" class="hidden p-4 bg-emerald-950/30 border border-emerald-500/20 rounded-xl text-center space-y-1">
-                                <p class="text-[10px] text-emerald-300 font-bold uppercase tracking-wider">Código gerado — partilha com os professores</p>
+                                <p id="school-code-result-label" class="text-[10px] text-emerald-300 font-bold uppercase tracking-wider">Código gerado — é fixo pra sempre, partilha com os professores</p>
                                 <p id="school-code-result-value" class="text-2xl font-black text-white tracking-widest"></p>
                             </div>
                         </div>
@@ -463,7 +464,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
@@ -663,6 +664,14 @@
         }
 
         // --- REGISTO DA ESCOLA (GERA O CÓDIGO ÚNICO) ---
+        function normalizeInstitutionKey(name) {
+            return (name || "")
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
         async function registerSchool(event) {
             event.preventDefault();
 
@@ -672,9 +681,19 @@
                 playBeepSound('error');
                 return;
             }
+            const institutionKey = normalizeInstitutionKey(institution);
 
             if (!isFirebaseActive) {
                 if (!window.offlineSchools) window.offlineSchools = {};
+
+                // O código é fixo: se essa escola já foi registada antes, reaproveita o código existente.
+                const existingEntry = Object.values(window.offlineSchools).find(s => normalizeInstitutionKey(s.institutionName) === institutionKey);
+                if (existingEntry) {
+                    showSchoolCodeResult(existingEntry.code, true);
+                    showToast("ℹ️", "[Modo Demonstração] Essa escola já tinha um código — ele nunca muda!");
+                    playBeepSound('success');
+                    return;
+                }
 
                 let schoolCode = generateSchoolCode(institution);
                 let attempts = 0;
@@ -688,13 +707,26 @@
                     code: schoolCode
                 };
 
-                showSchoolCodeResult(schoolCode);
+                showSchoolCodeResult(schoolCode, false);
                 showToast("✨", "[Modo Demonstração] Escola registada offline!");
                 playBeepSound('levelup');
                 return;
             }
 
             try {
+                // O código é fixo: se essa escola já foi registada antes, reaproveita o código existente em vez de criar um novo.
+                const schoolsCol = collection(db, 'usuarios', appId, 'public', 'data', 'schools');
+                const existingQuery = query(schoolsCol, where('institutionNameKey', '==', institutionKey));
+                const existingSnap = await getDocs(existingQuery);
+
+                if (!existingSnap.empty) {
+                    const existingCode = existingSnap.docs[0].data().code;
+                    showSchoolCodeResult(existingCode, true);
+                    showToast("ℹ️", "Essa escola já tinha um código — ele nunca muda!");
+                    playBeepSound('success');
+                    return;
+                }
+
                 let schoolCode = generateSchoolCode(institution);
                 let schoolRef = doc(db, 'usuarios', appId, 'public', 'data', 'schools', schoolCode);
                 let schoolSnap = await getDoc(schoolRef);
@@ -708,13 +740,14 @@
 
                 await setDoc(schoolRef, {
                     institutionName: institution,
+                    institutionNameKey: institutionKey,
                     code: schoolCode,
                     createdBy: currentUser ? currentUser.uid : null,
                     createdTimestamp: new Date().toISOString()
                 });
 
-                showSchoolCodeResult(schoolCode);
-                showToast("✨", "Escola registada com sucesso!");
+                showSchoolCodeResult(schoolCode, false);
+                showToast("✨", "Escola registada com sucesso! Esse código é fixo e nunca vai mudar.");
                 playBeepSound('levelup');
             } catch (error) {
                 console.error("Erro ao registar escola:", error);
@@ -724,11 +757,17 @@
         }
         window.registerSchool = registerSchool;
 
-        function showSchoolCodeResult(schoolCode) {
+        function showSchoolCodeResult(schoolCode, alreadyExisted) {
             const resultBox = document.getElementById('school-code-result');
             const resultValue = document.getElementById('school-code-result-value');
+            const resultLabel = document.getElementById('school-code-result-label');
             if (resultBox && resultValue) {
                 resultValue.innerText = schoolCode;
+                if (resultLabel) {
+                    resultLabel.innerText = alreadyExisted
+                        ? "Essa escola já tinha esse código — ele é fixo e nunca muda"
+                        : "Código gerado — é fixo pra sempre, partilha com os professores";
+                }
                 resultBox.classList.remove('hidden');
             }
         }
@@ -1068,7 +1107,7 @@
         }
 
         function executeCombatAction() {
-            const boss = bosses[currentStageIdx];
+            const boss = getBoss(currentStageIdx);
             const logCont = document.getElementById('battle-log');
             const combatCard = document.getElementById('combat-card-element');
 
@@ -1119,6 +1158,7 @@
                 document.getElementById('battleground-container').classList.add('hidden');
                 
                 if (boss.isFinal) {
+                    document.getElementById('reflective-intro-text').innerText = boss.reflectiveIntro || "";
                     document.getElementById('modal-reflective-question').classList.remove('hidden');
                 } else {
                     document.getElementById('battle-victory-screen').classList.remove('hidden');
@@ -1178,48 +1218,48 @@
 
             document.getElementById('battle-victory-screen').classList.remove('hidden');
             document.getElementById('victory-title').innerText = "🏆 Defensor Lenda da Escola!";
-            document.getElementById('victory-desc').innerText = "O Titã da Máscara foi curado da sua insegurança! Agora, ajuda a mapear os problemas da escola na aba 'Radar de Clima'.";
+            document.getElementById('victory-desc').innerText = `${chosenFinalBoss ? chosenFinalBoss.name : "O chefão final"} foi curado da insegurança dele! Agora, ajuda a mapear os problemas da escola na aba 'Radar de Clima'.`;
             document.getElementById('battle-xp-reward').innerText = "+250 XP Extra";
         }
 
         // --- POOL DE TÁTICAS DE CONVIVÊNCIA COM EXPLICAÇÃO ---
         const poolTactics = {
             dialogo: [
-                { name: "Propor Conversa Aberta", dBoss: 35, dPlayer: 0, msg: "Propor o diálogo amigável desarma o ódio.", success: true, explanation: "Muito bem! Conversar sem acusar faz com que as pessoas parem de se defender com raiva e comecem a ouvir-se." },
-                { name: "Gritar de volta", dBoss: 0, dPlayer: 25, msg: "Gritar apenas alimenta a agressividade.", success: false, explanation: "Gritar de volta cria um escudo de fúria na outra pessoa. A agressividade nunca resolve a dor de um conflito." },
-                { name: "Enviar Apoio Construtivo", dBoss: 30, dPlayer: 0, msg: "Mensagens positivas isolam as atitudes do Troll.", success: true, explanation: "Excelente! Unir a turma para enviar apoio a quem está a sofrer cancela o poder destrutivo das palavras de ódio." },
-                { name: "Espalhar o Boato Também", dBoss: 0, dPlayer: 30, msg: "Repassar fofocas multiplica o dano.", success: false, explanation: "Reencaminhar um print ou boato, mesmo 'só entre amigos', continua a espalhar a dor. A fofoca cresce a cada partilha." },
-                { name: "Chamar Ajuda de um Mediador", dBoss: 35, dPlayer: 0, msg: "Um terceiro imparcial acalma o conflito.", success: true, explanation: "Sábio! Pedir apoio a um colega mediador ou professor evita que o diálogo vire discussão e mantém o foco na solução." },
-                { name: "Ignorar Educadamente e Bloquear", dBoss: 25, dPlayer: 0, msg: "Cortar o acesso ao Troll reduz o seu poder.", success: true, explanation: "Válido! Nem sempre é preciso confrontar: bloquear e denunciar o perfil também corta a energia do conflito, sem alimentar a raiva." }
+                { name: "Chamar Pra Conversar", dBoss: 35, dPlayer: 0, msg: "Conversar sem brigar faz o ódio diminuir.", success: true, explanation: "Boa! Conversar sem acusar ninguém faz as pessoas pararem de se defender com raiva e começarem a se ouvir." },
+                { name: "Gritar de Volta", dBoss: 0, dPlayer: 25, msg: "Gritar só deixa tudo pior.", success: false, explanation: "Gritar de volta só deixa a outra pessoa mais brava ainda. Brigar nunca resolve o problema de verdade." },
+                { name: "Mandar Mensagens de Apoio", dBoss: 30, dPlayer: 0, msg: "Mensagens boas cortam o poder do Troll.", success: true, explanation: "Muito bom! Quando a turma se une pra apoiar quem tá sofrendo, as palavras ruins perdem a força." },
+                { name: "Também Espalhar o Boato", dBoss: 0, dPlayer: 30, msg: "Passar fofoca adiante só piora tudo.", success: false, explanation: "Mandar um print ou fofoca adiante, mesmo 'só pros amigos', continua machucando alguém. A fofoca cresce cada vez que é repassada." },
+                { name: "Pedir Ajuda de um Mediador", dBoss: 35, dPlayer: 0, msg: "Uma pessoa neutra ajuda a acalmar tudo.", success: true, explanation: "Ótima ideia! Pedir ajuda a um colega ou professor evita que a conversa vire briga e ajuda a achar uma solução." },
+                { name: "Ignorar e Bloquear", dBoss: 25, dPlayer: 0, msg: "Cortar o acesso do Troll tira o poder dele.", success: true, explanation: "Também vale! Nem sempre precisa enfrentar: bloquear e denunciar o perfil também ajuda, sem alimentar a briga." }
             ],
             expressao: [
-                { name: "Desabafar com um Adulto", dBoss: 45, dPlayer: 0, msg: "Romper o silêncio traz segurança.", success: true, explanation: "Corajoso! Falar com um professor ou encarregado de educação não é ser 'queixinhas', é criar uma rede de proteção coletiva." },
-                { name: "Apoiar a exclusão", dBoss: 0, dPlayer: 35, msg: "Silêncio cúmplice magoa a turma.", success: false, explanation: "Ao concordar ou rir do isolamento de um colega só para pertencer ao grupo, estás a validar a injustiça e a enfraquecer o teu caráter." },
-                { name: "Convidar o colega isolado", dBoss: 40, dPlayer: 0, msg: "O acolhimento quebra o isolamento.", success: true, explanation: "Espetacular! Trazer quem está sozinho para o convívio cura a solidão e diminui as dores emocionais no colégio." },
-                { name: "Fingir que Não Viu Nada", dBoss: 0, dPlayer: 30, msg: "Fechar os olhos deixa o problema crescer.", success: false, explanation: "Fazer de conta que não reparaste também é uma escolha — e ela permite que a injustiça continue a acontecer sem consequências." },
-                { name: "Escrever num Diário Emocional", dBoss: 25, dPlayer: 0, msg: "Organizar os sentimentos antes de agir.", success: true, explanation: "Boa estratégia! Colocar no papel o que sentes ajuda a perceber melhor a situação antes de decidir o próximo passo." },
-                { name: "Usar a Caixa de Sugestões Anónima", dBoss: 35, dPlayer: 0, msg: "Reportar em segurança sem exposição.", success: true, explanation: "Inteligente! Quando falar cara a cara é difícil, usar um canal anónimo garante que o problema chega a quem pode ajudar." }
+                { name: "Contar Pra Um Adulto", dBoss: 45, dPlayer: 0, msg: "Falar sobre o problema traz mais segurança.", success: true, explanation: "Corajoso! Contar pra um professor ou responsável não é 'dedurar', é criar uma rede de proteção pra todo mundo." },
+                { name: "Ficar do Lado de Quem Exclui", dBoss: 0, dPlayer: 35, msg: "Ficar calado também machuca a turma.", success: false, explanation: "Concordar ou rir enquanto excluem alguém, só pra fazer parte do grupo, é apoiar uma injustiça e enfraquece o teu caráter." },
+                { name: "Chamar o Colega Sozinho Pra Perto", dBoss: 40, dPlayer: 0, msg: "Acolher alguém acaba com a solidão dele.", success: true, explanation: "Demais! Chamar quem tá sozinho pra conversar ou brincar junto cura a solidão e deixa a escola mais legal." },
+                { name: "Fingir Que Não Viu Nada", dBoss: 0, dPlayer: 30, msg: "Fingir que não viu deixa o problema crescer.", success: false, explanation: "Fingir que não reparou também é uma escolha — e ela deixa a injustiça continuar acontecendo, sem ninguém fazer nada." },
+                { name: "Escrever o Que Sente", dBoss: 25, dPlayer: 0, msg: "Colocar os sentimentos no papel ajuda a pensar melhor.", success: true, explanation: "Boa estratégia! Escrever o que você sente ajuda a entender melhor a situação antes de decidir o que fazer." },
+                { name: "Usar a Caixinha de Sugestões Anônima", dBoss: 35, dPlayer: 0, msg: "Contar sem se expor também é uma forma de ajudar.", success: true, explanation: "Esperto! Quando é difícil falar cara a cara, usar um canal anônimo garante que o problema chegue até quem pode ajudar." }
             ],
             preservacao: [
-                { name: "Recriar Arte Autorizada", dBoss: 50, dPlayer: 0, msg: "Reconstruir o espaço limpa a mente.", success: true, explanation: "Brilhante! Canalizar a energia para arte urbana autorizada reconstrói a harmonia e o brio coletivo pela escola." },
-                { name: "Denúncia Segura", dBoss: 40, dPlayer: 0, msg: "Proteção responsável do colégio.", success: true, explanation: "Cidadania em ação! Preservar as salas e casas de banho limpas garante que todos nós tenhamos um ambiente onde dá gosto estudar." },
-                { name: "Ignorar e Sujar Também", dBoss: 0, dPlayer: 25, msg: "Vandalismo atrai decadência emocional.", success: false, explanation: "Sujar e quebrar carteiras afeta o teu próprio bem-estar diário. Cuidar do património é respeitar o esforço de todos os que ali trabalham." },
-                { name: "Filmar Só Para Rir", dBoss: 0, dPlayer: 30, msg: "Gravar sem agir também é conivência.", success: false, explanation: "Filmar a destruição para partilhar como 'piada' incentiva quem está a estragar o património a continuar, em vez de travar." },
-                { name: "Organizar um Mutirão de Limpeza", dBoss: 45, dPlayer: 0, msg: "A ação coletiva restaura o espaço.", success: true, explanation: "Excelente liderança! Juntar colegas para cuidar do espaço comum transforma o ambiente e inspira mais gente a preservar." },
-                { name: "Avisar o Zelador ou Coordenação", dBoss: 35, dPlayer: 0, msg: "Reportar rápido evita mais estragos.", success: true, explanation: "Certo! Avisar quem pode resolver rapidamente impede que o estrago aumente e mostra responsabilidade com o espaço de todos." }
+                { name: "Fazer um Desenho Legal no Lugar", dBoss: 50, dPlayer: 0, msg: "Deixar o espaço bonito de novo acalma todo mundo.", success: true, explanation: "Demais! Usar a energia pra deixar o espaço bonito (com autorização) recupera o clima bom da escola." },
+                { name: "Avisar de Forma Segura", dBoss: 40, dPlayer: 0, msg: "Cuidar da escola é responsabilidade de todo mundo.", success: true, explanation: "Isso! Manter as salas e banheiros limpos garante um lugar bom pra todo mundo estudar." },
+                { name: "Ignorar e Sujar Também", dBoss: 0, dPlayer: 25, msg: "Estragar as coisas também prejudica você.", success: false, explanation: "Sujar ou quebrar as coisas da escola também atrapalha o teu próprio dia a dia. Cuidar do espaço é respeitar o esforço de todo mundo." },
+                { name: "Filmar Só Pra Rir", dBoss: 0, dPlayer: 30, msg: "Gravar sem fazer nada também é errado.", success: false, explanation: "Filmar alguém estragando as coisas só pra postar como 'piada' incentiva a pessoa a continuar, em vez de ajudar a parar." },
+                { name: "Organizar um Mutirão de Limpeza", dBoss: 45, dPlayer: 0, msg: "Trabalhar junto deixa o espaço melhor de novo.", success: true, explanation: "Ótima liderança! Juntar a turma pra cuidar do espaço comum transforma o ambiente e inspira mais gente a cuidar também." },
+                { name: "Avisar Alguém da Escola", dBoss: 35, dPlayer: 0, msg: "Avisar rápido evita que piore ainda mais.", success: true, explanation: "Boa! Avisar quem pode resolver rápido evita que o estrago fique maior e mostra que você se importa com o espaço de todos." }
             ],
             inseguranca: [
-                { name: "Dar Feedback Empático", dBoss: 55, dPlayer: 0, msg: "Ouvir a dor por trás da agressão desarma o Titã.", success: true, explanation: "Golpe de Mestre! Perceber que o valentão só ataca porque se sente fraco e pressionado em casa desmonta toda a sua armadura." },
-                { name: "Retaliar com Humilhação", dBoss: 0, dPlayer: 40, msg: "Alimentar o ciclo de dor cria tragédias.", success: false, explanation: "Tentar humilhar um adolescente problemático em público só aumenta a sua revolta e faz com que ele reaja de forma ainda mais violenta." },
-                { name: "Propor Mediação sem Julgamentos", dBoss: 45, dPlayer: 0, msg: "O equilíbrio da paz integra o rebelde.", success: true, explanation: "Lindo! Convidar o colega que gera conflitos a expressar as suas inseguranças sem ser julgado reconecta-o com a turma." },
-                { name: "Espalhar Rumores Sobre a Família Dele", dBoss: 0, dPlayer: 35, msg: "Atacar a vida pessoal aprofunda a ferida.", success: false, explanation: "Usar a vida familiar de alguém como arma é cruel e só confirma o medo de rejeição que alimenta o comportamento agressivo." },
-                { name: "Convidar para um Projeto em Grupo", dBoss: 40, dPlayer: 0, msg: "Incluir em vez de isolar constrói pontes.", success: true, explanation: "Ótima jogada! Dar um papel de responsabilidade a quem se sente excluído costuma transformar a raiva em pertencimento." },
-                { name: "Encaminhar para o Psicólogo Escolar", dBoss: 45, dPlayer: 0, msg: "Apoio profissional trata a raiz do problema.", success: true, explanation: "Muito maduro! Reconhecer que algumas dores precisam de ajuda especializada é um ato de cuidado, não de fraqueza." }
+                { name: "Tentar Entender o Que Ele Sente", dBoss: 55, dPlayer: 0, msg: "Entender a dor dele tira a força dele.", success: true, explanation: "Golpe de mestre! Perceber que ele só ataca porque tá se sentindo fraco ou com medo derruba toda a defesa dele." },
+                { name: "Humilhar de Volta", dBoss: 0, dPlayer: 40, msg: "Humilhar alguém só piora tudo.", success: false, explanation: "Tentar humilhar alguém na frente dos outros só deixa a pessoa mais brava e faz ela reagir de um jeito ainda pior." },
+                { name: "Propor Conversa Sem Julgar", dBoss: 45, dPlayer: 0, msg: "Conversar sem julgar traz mais paz.", success: true, explanation: "Que legal! Chamar quem cria confusão pra falar sobre o que sente, sem julgar, ajuda ele a se sentir parte da turma de novo." },
+                { name: "Falar Mal da Família Dele", dBoss: 0, dPlayer: 35, msg: "Atacar a família de alguém só machuca mais.", success: false, explanation: "Usar a vida pessoal de alguém como arma é cruel e só confirma o medo que alimenta esse comportamento agressivo." },
+                { name: "Chamar Pra Um Projeto em Grupo", dBoss: 40, dPlayer: 0, msg: "Incluir em vez de excluir aproxima as pessoas.", success: true, explanation: "Jogada ótima! Dar uma tarefa importante pra quem se sente excluído costuma transformar a raiva em vontade de pertencer." },
+                { name: "Chamar o Psicólogo da Escola", dBoss: 45, dPlayer: 0, msg: "Ajuda profissional resolve o problema de verdade.", success: true, explanation: "Muito maduro! Perceber que algumas dores precisam de ajuda especializada é um ato de cuidado, não de fraqueza." }
             ],
             resiliencia: [
-                { name: "Respirar Fundo e Pensar Antes de Agir", dBoss: 20, dPlayer: 0, msg: "Uma pausa consciente evita reações impulsivas.", success: true, explanation: "Ótimo hábito! Parar alguns segundos antes de reagir ajuda a escolher a atitude certa em vez da primeira reação de raiva." },
-                { name: "Explodir de Raiva no Momento", dBoss: 0, dPlayer: 20, msg: "Reagir no calor do momento custa energia emocional.", success: false, explanation: "Reagir por impulso, sem pensar, costuma piorar o conflito e deixa-te mais vulnerável emocionalmente depois." },
-                { name: "Pedir Apoio a um Amigo de Confiança", dBoss: 25, dPlayer: 0, msg: "Dividir o peso torna a situação mais leve.", success: true, explanation: "Muito válido! Ninguém precisa de enfrentar tudo sozinho — partilhar o que sentes com alguém de confiança fortalece a tua rede de apoio." }
+                { name: "Respirar Fundo Antes de Agir", dBoss: 20, dPlayer: 0, msg: "Parar um segundo antes de reagir evita raiva.", success: true, explanation: "Ótimo hábito! Parar alguns segundos antes de reagir ajuda a escolher a atitude certa, em vez da primeira reação de raiva." },
+                { name: "Explodir de Raiva na Hora", dBoss: 0, dPlayer: 20, msg: "Reagir sem pensar costuma piorar tudo.", success: false, explanation: "Reagir por impulso, sem pensar, costuma piorar a briga e ainda te deixa mais abalado depois." },
+                { name: "Pedir Ajuda a um Amigo de Confiança", dBoss: 25, dPlayer: 0, msg: "Dividir o que você sente deixa tudo mais leve.", success: true, explanation: "Muito válido! Ninguém precisa resolver tudo sozinho — contar o que sente pra alguém de confiança te deixa mais forte." }
             ]
         };
 
@@ -1231,7 +1271,7 @@
                 weaknessClass: "Empático(a) Ativo(a)",
                 hp: 80,
                 maxHp: 80,
-                desc: "Este monstro assombra quem vê injustiças mas tem medo de falar.",
+                desc: "Esse monstro aparece quando você vê algo errado mas fica com medo de falar.",
                 weaknessPool: "expressao",
                 altPool: "dialogo"
             },
@@ -1242,7 +1282,7 @@
                 weaknessClass: "Defensor(a) Digital",
                 hp: 100,
                 maxHp: 100,
-                desc: "Este monstro espalha segredos e fofocas cruéis no grupo da turma.",
+                desc: "Esse monstro adora espalhar fofoca e maldade nos grupos da turma.",
                 weaknessPool: "dialogo",
                 altPool: "expressao"
             },
@@ -1253,23 +1293,81 @@
                 weaknessClass: "Mediador(a) da Paz",
                 hp: 110,
                 maxHp: 110,
-                desc: "Alimenta-se do vandalismo, da sujidade e de estragar as coisas comuns.",
+                desc: "Esse monstro fica mais forte quando alguém suja ou quebra as coisas da escola.",
                 weaknessPool: "preservacao",
                 altPool: "dialogo"
-            },
+            }
+        ];
+
+        // --- VARIAÇÕES DO CHEFÃO FINAL (SORTEADO, NUNCA É SEMPRE O MESMO) ---
+        const finalBossVariants = [
             {
-                name: "Titã da Máscara (CHEFÃO FINAL)",
+                name: "Titã da Máscara",
                 emoji: "🎭",
                 weakness: "Insegurança",
                 weaknessClass: "Mediador(a) da Paz",
                 hp: 140,
                 maxHp: 140,
-                desc: "O maior dos perigos. Ele mascara as suas inseguranças domésticas e familiares atacando os outros e quebrando regras para se sentir forte.",
+                desc: "O monstro mais perigoso de todos. Ele esconde os problemas que tem em casa atacando os outros e desrespeitando as regras, só pra se sentir mais forte.",
+                reflectiveIntro: "O Titã revelou que agia com raiva porque sofria em casa e tinha medo de não ser aceito.",
+                weaknessPool: "inseguranca",
+                altPool: "dialogo",
+                isFinal: true
+            },
+            {
+                name: "Coração de Ferro",
+                emoji: "🛡️",
+                weakness: "Insegurança",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 140,
+                maxHp: 140,
+                desc: "Esse monstro construiu uma armadura de frieza porque tem muito medo de ser rejeitado pelos outros.",
+                reflectiveIntro: "O Coração de Ferro revelou que se fechava e afastava todo mundo porque tinha muito medo de ser rejeitado.",
+                weaknessPool: "inseguranca",
+                altPool: "dialogo",
+                isFinal: true
+            },
+            {
+                name: "Sombra da Raiva",
+                emoji: "🔥",
+                weakness: "Insegurança",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 140,
+                maxHp: 140,
+                desc: "Esse monstro nasce da raiva que alguém guarda por dentro sem saber como lidar com ela.",
+                reflectiveIntro: "A Sombra da Raiva revelou que explodia com os outros porque não sabia lidar com tudo que sentia por dentro.",
+                weaknessPool: "inseguranca",
+                altPool: "dialogo",
+                isFinal: true
+            },
+            {
+                name: "Rei do Orgulho",
+                emoji: "👑",
+                weakness: "Insegurança",
+                weaknessClass: "Mediador(a) da Paz",
+                hp: 140,
+                maxHp: 140,
+                desc: "Esse monstro finge que está tudo bem o tempo todo, só pra ninguém perceber o quanto ele está sofrendo por dentro.",
+                reflectiveIntro: "O Rei do Orgulho revelou que fingia estar bem o tempo todo pra ninguém descobrir que ele também sofria.",
                 weaknessPool: "inseguranca",
                 altPool: "dialogo",
                 isFinal: true
             }
         ];
+
+        let chosenFinalBoss = null;
+        function getFinalBoss() {
+            if (!chosenFinalBoss) {
+                chosenFinalBoss = finalBossVariants[Math.floor(Math.random() * finalBossVariants.length)];
+            }
+            return chosenFinalBoss;
+        }
+
+        const TOTAL_STAGES = bosses.length + 1; // 3 chefões fixos + 1 chefão final sorteado
+
+        function getBoss(idx) {
+            return idx < bosses.length ? bosses[idx] : getFinalBoss();
+        }
 
         // --- BANCO DE PALAVRAS-CHAVE (CONSTRUÍDO A PARTIR DAS PRÓPRIAS TÁTICAS DO JOGO) ---
         // Usa os termos das táticas certas/erradas de todas as pools para avaliar respostas escritas livremente.
@@ -1412,7 +1510,7 @@
                 return;
             }
 
-            const boss = bosses[currentStageIdx];
+            const boss = getBoss(currentStageIdx);
             const { posMatches, negMatches } = analyzeFreeResponse(text);
             const isBonus = false; // A resposta livre não usa o bónus de classe, é avaliada só pelo conteúdo.
 
@@ -1485,13 +1583,13 @@
                 return;
             }
 
-            if (currentStageIdx >= bosses.length) {
+            if (currentStageIdx >= TOTAL_STAGES) {
                 document.getElementById('battleground-container').classList.add('hidden');
                 document.getElementById('battle-victory-screen').classList.remove('hidden');
                 return;
             }
 
-            const boss = bosses[currentStageIdx];
+            const boss = getBoss(currentStageIdx);
             if (currentBossHp === 0) currentBossHp = boss.hp;
 
             document.getElementById('battleground-container').classList.remove('hidden');
@@ -1819,9 +1917,9 @@
         ];
 
         const classesDisponiveis = [
-            { nome: "Defensor(a) Digital", desc: "Neutraliza agressões e bullying nos chats escolares.", icon: "💻", bonus: "Bónus contra Trolls" },
-            { nome: "Mediador(a) da Paz", desc: "Equilibra desentendimentos físicos ou verbais de forma justa.", icon: "⚖️", bonus: "Bónus contra Titãs" },
-            { nome: "Empático(a) Ativo(a)", desc: "Acolhe alunos isolados e reduz a solidão.", icon: "🧠", bonus: "Bónus contra Silêncio" }
+            { nome: "Defensor(a) Digital", desc: "Ajuda a parar brigas e bullying nos grupos da escola.", icon: "💻", bonus: "Bônus contra Trolls" },
+            { nome: "Mediador(a) da Paz", desc: "Ajuda a resolver brigas e discussões de um jeito justo.", icon: "⚖️", bonus: "Bônus contra chefões" },
+            { nome: "Empático(a) Ativo(a)", desc: "Acolhe quem está sozinho e ajuda a diminuir a solidão.", icon: "🧠", bonus: "Bônus contra Silêncio" }
         ];
 
         let selectedAvatarIdx = 0;
