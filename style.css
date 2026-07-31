@@ -1,0 +1,27 @@
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            50% { transform: translateX(5px) rotate(2deg); }
+            75% { transform: translateX(-5px) rotate(-1deg); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .hover-scale-102:hover { transform: scale(1.02); }
+        
+        /* Estilos de luzes de fundo inspirados em plataformas de jogos */
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+        }
+        /* Animação de pulsação para o botão de Jogar */
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(99, 102, 241, 0.8); }
+        }
+        .btn-pulse {
+            animation: pulse-glow 2s infinite;
+        }
